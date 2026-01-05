@@ -109,7 +109,7 @@
             font-size: 1rem; 
             margin-bottom: 15px; 
             color: var(--text-dark); 
-            line-height: 1.5; /* Satır arası boşluk */
+            line-height: 1.5; 
         }
         
         .warning-text { font-size: 0.9rem; color: #b71c1c; margin-bottom: 10px; display: block; }
@@ -346,11 +346,11 @@
         // --- AYARLAR ---
         let currentLang = 'tr';
         
-        // SENİN VERDİĞİN YENİ LİNK BURADA:
+        // SENİN VERDİĞİN LİNKLER:
         const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzGeukfxAnDZBBDEYZEHc9eTd08spVfCSTFOqVBM3iiTIQAinFRrOhsgzdEw0ttyp5QA/exec";
-        
         const TM_MODEL_URL = "https://teachablemachine.withgoogle.com/models/Y2HlQGqEh/";
 
+        // ÇEVİRİ SÖZLÜĞÜ (Hatasız)
         const translations = {
             'tr': {
                 'subtitle-text': 'Eski Medeniyetlerin İzinde...',
@@ -360,7 +360,7 @@
                 'civ-2': '🌷 Osmanlı İznik Çinisi',
                 'civ-3': '🦁 Hitit Seramiği',
                 'civ-4': '🧱 Sümer Seramiği',
-                'civ-5': '🦅 Nazca Seramiği',
+                'civ-5': '🦅 Nazca Seramiği', 
                 'btn-cam-text': '📷 Fotoğraf Çek',
                 'btn-upload-text': '📂 Dosyadan Yükle',
                 'placeholder-text': '🔍 Eseri yükleyiniz.',
@@ -378,4 +378,213 @@
             },
             'en': {
                 'subtitle-text': 'Tracing Ancient Civilizations...',
-                'instr-text': 'Take a photo or upload one from your device
+                'instr-text': 'Take a photo or upload one from your device to identify the historical artifact.<br>AI analyzes it in seconds.',
+                'warn-text': '⚠️ The system currently <strong>only</strong> recognizes the following civilizations:',
+                'civ-1': '🏛️ Ancient Greek Pottery',
+                'civ-2': '🌷 Ottoman Iznik Pottery',
+                'civ-3': '🦁 Hittite Pottery',
+                'civ-4': '🧱 Sumerian Pottery',
+                'civ-5': '🦅 Nazca Pottery',
+                'btn-cam-text': '📷 Take Photo',
+                'btn-upload-text': '📂 Upload File',
+                'placeholder-text': '🔍 Upload an artifact.',
+                'feedback-q': '📜 Is this analysis historically accurate?',
+                'btn-yes': '✔ CORRECT',
+                'btn-no': '✖ WRONG',
+                'invite-title': 'We Value Your Feedback',
+                'invite-desc': 'We appreciate your feedback to improve Archazam.',
+                'btn-contact-text': '✒️ Contact Us',
+                'form-title': '📝 Contact Form',
+                'lbl-email': 'Your Email (Optional):',
+                'lbl-msg': 'Your Message:',
+                'btn-send': 'SEND',
+                'loading-msg': '🏺 Excavating the model, please wait...'
+            }
+        };
+
+        // Bu fonksiyon Teachable Machine'den gelen İngilizce isimleri düzeltir
+        function getTranslatedClassName(originalName, lang) {
+            if (lang === 'tr') return originalName;
+            
+            const lower = originalName.toLowerCase();
+            
+            // İngilizce Çeviriler (Peru tamamen temizlendi)
+            if (lower.includes('yunan') || lower.includes('greek')) return 'Ancient Greek Pottery';
+            if (lower.includes('iznik') || lower.includes('osmanlı') || lower.includes('ottoman')) return 'Ottoman Iznik Pottery';
+            if (lower.includes('hitit') || lower.includes('hittite')) return 'Hittite Pottery';
+            if (lower.includes('sümer') || lower.includes('sumer') || lower.includes('çin') || lower.includes('china')) return 'Sumerian Pottery';
+            if (lower.includes('nazca')) return 'Nazca Pottery';
+            
+            return originalName; 
+        }
+
+        // Dil Değiştirme Fonksiyonu
+        function toggleLanguage() {
+            // Dili değiştir
+            currentLang = currentLang === 'tr' ? 'en' : 'tr';
+            
+            // Buton yazısını değiştir
+            const btn = document.getElementById('lang-btn');
+            if (btn) btn.innerText = currentLang === 'tr' ? 'EN' : 'TR';
+            
+            // HTML dil etiketini güncelle (CSS İ/I sorunu için)
+            document.documentElement.lang = currentLang;
+
+            // Metinleri güncelle
+            const t = translations[currentLang];
+            for (const [id, text] of Object.entries(t)) {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = text;
+            }
+            
+            // Eğer ekranda sonuç varsa, onun da dilini anlık değiştir
+            if (lastPrediction) updateBars(lastPrediction);
+        }
+
+        // --- MODEL ---
+        let model, webcam, labelContainer, maxPredictions;
+        let isModelLoading = false;
+        let lastPrediction = null; 
+        let highestClass = ""; 
+
+        async function loadModel() {
+            if (model || isModelLoading) return;
+            isModelLoading = true;
+            document.getElementById("loading-msg").style.display = "block";
+            try {
+                const modelURL = TM_MODEL_URL + "model.json";
+                const metadataURL = TM_MODEL_URL + "metadata.json";
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+                labelContainer = document.getElementById("label-container");
+                labelContainer.innerHTML = "";
+                for (let i = 0; i < maxPredictions; i++) {
+                    let div = document.createElement("div");
+                    div.className = "prediction-item";
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between;">
+                            <span id="label-name-${i}">Sınıf ${i}</span>
+                            <span id="label-prob-${i}">%0</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div id="progress-${i}" class="progress-bar-fill"></div>
+                        </div>
+                    `;
+                    labelContainer.appendChild(div);
+                }
+            } catch (error) { alert("Model yüklenemedi. Lütfen internet bağlantınızı kontrol edin."); }
+            isModelLoading = false;
+            document.getElementById("loading-msg").style.display = "none";
+        }
+
+        async function init() {
+            await loadModel();
+            document.getElementById("placeholder-text").style.display = "none";
+            document.getElementById("uploaded-image").style.display = "none";
+            const container = document.getElementById("visual-area");
+            const oldCanvas = container.querySelector("canvas");
+            if(oldCanvas) oldCanvas.remove();
+            const flip = true; 
+            webcam = new tmImage.Webcam(300, 300, flip); 
+            await webcam.setup(); await webcam.play();
+            window.requestAnimationFrame(loop);
+            container.appendChild(webcam.canvas);
+            resetFeedback();
+        }
+
+        async function loop() { webcam.update(); await predict(); window.requestAnimationFrame(loop); }
+
+        async function handleImageUpload(event) {
+            await loadModel();
+            if(webcam) { await webcam.stop(); webcam = null; const container = document.getElementById("visual-area"); const canvas = container.querySelector("canvas"); if(canvas) canvas.remove(); }
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById("placeholder-text").style.display = "none";
+                    const imgElement = document.getElementById("uploaded-image");
+                    imgElement.src = e.target.result;
+                    imgElement.style.display = "block";
+                    imgElement.onload = async function() { await predictImage(imgElement); }
+                    resetFeedback();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function predict() { if(webcam && webcam.canvas) { const prediction = await model.predict(webcam.canvas); updateBars(prediction); } }
+        async function predictImage(imageElement) { const prediction = await model.predict(imageElement); updateBars(prediction); }
+
+        function updateBars(prediction) {
+            lastPrediction = prediction;
+            let maxProb = 0;
+            highestClass = ""; 
+            for (let i = 0; i < maxPredictions; i++) {
+                const nameSpan = document.getElementById(`label-name-${i}`);
+                const probSpan = document.getElementById(`label-prob-${i}`);
+                const progressBar = document.getElementById(`progress-${i}`);
+                let displayName = prediction[i].className;
+                if (prediction[i].probability > maxProb) {
+                    maxProb = prediction[i].probability;
+                    highestClass = displayName;
+                }
+                
+                // İNGİLİZCE İSE İSİMLERİ ÇEVİR
+                if(currentLang === 'en') {
+                    displayName = getTranslatedClassName(displayName, 'en');
+                }
+                
+                const probability = prediction[i].probability.toFixed(2);
+                const percent = Math.round(probability * 100) + "%";
+                nameSpan.innerHTML = displayName;
+                probSpan.innerHTML = percent;
+                progressBar.style.width = percent;
+            }
+        }
+
+        function resetFeedback() {
+            document.getElementById("feedback-section").style.display = "block";
+            document.getElementById("feedback-message").innerText = "";
+            document.getElementById("btn-yes").disabled = false;
+            document.getElementById("btn-no").disabled = false;
+        }
+
+        function giveFeedback(isCorrect) {
+            const messageArea = document.getElementById("feedback-message");
+            document.getElementById("btn-yes").disabled = true;
+            document.getElementById("btn-no").disabled = true;
+            
+            if (isCorrect) {
+                messageArea.style.color = "#2e7d32";
+                messageArea.innerText = currentLang === 'tr' ? "✔ Katkınız için teşekkürler!" : "✔ Thanks for your contribution!";
+            } else {
+                messageArea.style.color = "#c62828";
+                messageArea.innerText = currentLang === 'tr' ? "✖ Geri bildirim alındı." : "✖ Feedback received.";
+            }
+
+            // --- GOOGLE SHEETS VERİ GÖNDERME ---
+            const params = new URLSearchParams();
+            params.append("Karar", isCorrect ? "DOGRU" : "HATALI");
+            params.append("Tahmin", highestClass); 
+            params.append("Dil", currentLang);
+
+            fetch(SHEET_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                body: params
+            })
+            .then(() => console.log("Veri Google Sheets'e yollandı."))
+            .catch(error => console.error("Hata:", error));
+        }
+
+        function toggleContactForm() {
+            const formContainer = document.getElementById("contact-form-container");
+            if (formContainer.style.display === "none" || formContainer.style.display === "") {
+                formContainer.style.display = "block";
+            } else {
+                formContainer.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
