@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCHAZAM</title>
+    <title>ARCHAZAM - Arkeoloji Dedektifi</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -55,24 +55,51 @@
         .container::before { top: 10px; left: 10px; }
         .container::after { top: 10px; right: 10px; }
 
-        /* DİL BUTONU */
-        #lang-btn {
+        /* --- YENİ DİL SEÇİCİ TASARIMI --- */
+        .lang-switch-wrapper {
             position: absolute;
             top: 15px;
-            right: 40px;
+            right: 30px;
+            display: flex;
+            align-items: center;
             background-color: var(--text-dark);
-            color: var(--accent-gold);
             border: 1px solid var(--accent-gold);
-            padding: 6px 12px;
+            border-radius: 6px;
+            padding: 4px;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .lang-opt {
+            cursor: pointer;
+            padding: 4px 10px;
             font-family: 'Cinzel', serif;
             font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
             font-size: 0.85rem;
-            transition: all 0.3s;
-            z-index: 100;
+            color: #aaa; /* Pasif renk */
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border-radius: 4px;
         }
-        #lang-btn:hover { background-color: var(--accent-gold); color: var(--text-dark); }
+
+        .lang-opt:hover {
+            color: #fff;
+        }
+
+        .lang-opt.active {
+            background-color: var(--accent-gold);
+            color: var(--text-dark); /* Aktifken koyu yazı */
+        }
+
+        .lang-divider {
+            width: 1px;
+            height: 15px;
+            background-color: #555;
+            margin: 0 2px;
+        }
+        /* --------------------------------- */
 
         /* BAŞLIK */
         h1 {
@@ -109,7 +136,7 @@
             font-size: 1rem; 
             margin-bottom: 15px; 
             color: var(--text-dark); 
-            line-height: 1.5; 
+            line-height: 1.5; /* Satır arası boşluk */
         }
         
         .warning-text { font-size: 0.9rem; color: #b71c1c; margin-bottom: 10px; display: block; }
@@ -261,8 +288,15 @@
 <body>
 
     <div class="container">
-        <button id="lang-btn" onclick="toggleLanguage()">EN</button>
-
+        <div class="lang-switch-wrapper">
+            <div class="lang-opt active" id="btn-tr" onclick="setLanguage('tr')">
+                <span>🇹🇷</span> TR
+            </div>
+            <div class="lang-divider"></div>
+            <div class="lang-opt" id="btn-en" onclick="setLanguage('en')">
+                <span>🇬🇧</span> EN
+            </div>
+        </div>
         <h1>ARCHAZAM</h1>
         <p class="subtitle" id="subtitle-text">Eski Medeniyetlerin İzinde...</p>
         
@@ -278,7 +312,7 @@
                 <span class="civ-tag" id="civ-2">🌷 Osmanlı İznik Çinisi</span>
                 <span class="civ-tag" id="civ-3">🦁 Hitit Seramiği</span>
                 <span class="civ-tag" id="civ-4">🧱 Sümer Seramiği</span>
-                <span class="civ-tag" id="civ-5">🦅 Nazca Seramiği</span>
+                <span class="civ-tag" id="civ-5">🦅 Nazca (Peru) Seramiği</span>
             </div>
         </div>
         
@@ -346,11 +380,11 @@
         // --- AYARLAR ---
         let currentLang = 'tr';
         
-        // SENİN VERDİĞİN LİNKLER:
+        // SENİN VERDİĞİN YENİ LİNK BURADA:
         const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzGeukfxAnDZBBDEYZEHc9eTd08spVfCSTFOqVBM3iiTIQAinFRrOhsgzdEw0ttyp5QA/exec";
+        
         const TM_MODEL_URL = "https://teachablemachine.withgoogle.com/models/Y2HlQGqEh/";
 
-        // ÇEVİRİ SÖZLÜĞÜ (Hatasız)
         const translations = {
             'tr': {
                 'subtitle-text': 'Eski Medeniyetlerin İzinde...',
@@ -360,7 +394,7 @@
                 'civ-2': '🌷 Osmanlı İznik Çinisi',
                 'civ-3': '🦁 Hitit Seramiği',
                 'civ-4': '🧱 Sümer Seramiği',
-                'civ-5': '🦅 Nazca Seramiği', 
+                'civ-5': '🦅 Nazca (Peru) Seramiği',
                 'btn-cam-text': '📷 Fotoğraf Çek',
                 'btn-upload-text': '📂 Dosyadan Yükle',
                 'placeholder-text': '🔍 Eseri yükleyiniz.',
@@ -384,7 +418,7 @@
                 'civ-2': '🌷 Ottoman Iznik Pottery',
                 'civ-3': '🦁 Hittite Pottery',
                 'civ-4': '🧱 Sumerian Pottery',
-                'civ-5': '🦅 Nazca Pottery',
+                'civ-5': '🦅 Nazca (Peru) Pottery',
                 'btn-cam-text': '📷 Take Photo',
                 'btn-upload-text': '📂 Upload File',
                 'placeholder-text': '🔍 Upload an artifact.',
@@ -402,42 +436,39 @@
             }
         };
 
-        // Bu fonksiyon Teachable Machine'den gelen İngilizce isimleri düzeltir
         function getTranslatedClassName(originalName, lang) {
             if (lang === 'tr') return originalName;
-            
             const lower = originalName.toLowerCase();
-            
-            // İngilizce Çeviriler (Peru tamamen temizlendi)
             if (lower.includes('yunan') || lower.includes('greek')) return 'Ancient Greek Pottery';
             if (lower.includes('iznik') || lower.includes('osmanlı') || lower.includes('ottoman')) return 'Ottoman Iznik Pottery';
             if (lower.includes('hitit') || lower.includes('hittite')) return 'Hittite Pottery';
             if (lower.includes('sümer') || lower.includes('sumer') || lower.includes('çin') || lower.includes('china')) return 'Sumerian Pottery';
-            if (lower.includes('nazca')) return 'Nazca Pottery';
-            
+            if (lower.includes('nazca')) return 'Nazca (Peru) Pottery';
             return originalName; 
         }
 
-        // Dil Değiştirme Fonksiyonu
-        function toggleLanguage() {
-            // Dili değiştir
-            currentLang = currentLang === 'tr' ? 'en' : 'tr';
+        // --- YENİ DİL DEĞİŞTİRME FONKSİYONU ---
+        function setLanguage(lang) {
+            currentLang = lang;
             
-            // Buton yazısını değiştir
-            const btn = document.getElementById('lang-btn');
-            if (btn) btn.innerText = currentLang === 'tr' ? 'EN' : 'TR';
-            
-            // HTML dil etiketini güncelle (CSS İ/I sorunu için)
+            // HTML lang etiketini güncelle
             document.documentElement.lang = currentLang;
 
-            // Metinleri güncelle
+            // Butonların görünümünü güncelle (Aktif olan parlasın)
+            if(lang === 'tr') {
+                document.getElementById('btn-tr').classList.add('active');
+                document.getElementById('btn-en').classList.remove('active');
+            } else {
+                document.getElementById('btn-en').classList.add('active');
+                document.getElementById('btn-tr').classList.remove('active');
+            }
+
+            // Metinleri değiştir
             const t = translations[currentLang];
             for (const [id, text] of Object.entries(t)) {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = text;
             }
-            
-            // Eğer ekranda sonuç varsa, onun da dilini anlık değiştir
             if (lastPrediction) updateBars(lastPrediction);
         }
 
@@ -472,7 +503,7 @@
                     `;
                     labelContainer.appendChild(div);
                 }
-            } catch (error) { alert("Model yüklenemedi. Lütfen internet bağlantınızı kontrol edin."); }
+            } catch (error) { alert("Model hatası / Model Error"); }
             isModelLoading = false;
             document.getElementById("loading-msg").style.display = "none";
         }
@@ -528,12 +559,7 @@
                     maxProb = prediction[i].probability;
                     highestClass = displayName;
                 }
-                
-                // İNGİLİZCE İSE İSİMLERİ ÇEVİR
-                if(currentLang === 'en') {
-                    displayName = getTranslatedClassName(displayName, 'en');
-                }
-                
+                if(currentLang === 'en') displayName = getTranslatedClassName(displayName, 'en');
                 const probability = prediction[i].probability.toFixed(2);
                 const percent = Math.round(probability * 100) + "%";
                 nameSpan.innerHTML = displayName;
