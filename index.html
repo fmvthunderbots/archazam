@@ -164,7 +164,7 @@
             gap: 5px;
         }
 
-        .button-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        .button-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; }
 
         .action-btn {
             background-color: var(--text-dark);
@@ -186,6 +186,15 @@
         }
         .action-btn:hover { background-color: var(--primary-clay); transform: translateY(2px); box-shadow: 0 2px 0 #281815; }
         
+        /* UYARI STİLİ */
+        .upload-warning {
+            color: #c62828;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            margin-top: 5px;
+        }
+
         #visual-area {
             margin-top: 10px;
             border-radius: 4px;
@@ -328,6 +337,8 @@
             <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
         </div>
 
+        <p id="upload-warning" class="upload-warning">⚠️ Lütfen daha doğru sonuç almak için ekran görüntüsü yerine sadece eserin fotoğrafını yükleyiniz.</p>
+
         <div id="visual-area">
             <div id="placeholder-text">🔍 Eseri yükleyiniz.</div>
             <img id="uploaded-image" src="#" alt="Yüklenen Eser" />
@@ -397,6 +408,7 @@
                 'civ-5': '🦅 Nazca Seramiği',
                 'btn-cam-text': '📷 Fotoğraf Çek',
                 'btn-upload-text': '📂 Dosyadan Yükle',
+                'upload-warning': '⚠️ Lütfen daha doğru sonuç almak için ekran görüntüsü yerine sadece eserin fotoğrafını yükleyiniz.',
                 'placeholder-text': '🔍 Eseri yükleyiniz.',
                 'feedback-q': '📜 Bu analiz tarihi gerçeklerle uyuşuyor mu?',
                 'btn-yes': '✔ DOĞRU',
@@ -421,6 +433,7 @@
                 'civ-5': '🦅 Nazca Pottery',
                 'btn-cam-text': '📷 Take Photo',
                 'btn-upload-text': '📂 Upload File',
+                'upload-warning': '⚠️ For more accurate results, please upload only the photo of the artifact, not a screenshot.',
                 'placeholder-text': '🔍 Upload an artifact.',
                 'feedback-q': '📜 Is this analysis historically accurate?',
                 'btn-yes': '✔ CORRECT',
