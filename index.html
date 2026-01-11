@@ -539,7 +539,7 @@
             document.getElementById("btn-no").disabled = false;
         }
 
-        // --- GÜNCELLENMİŞ FEEDBACK FONKSİYONU ---
+        // --- GÜNCELLENMİŞ VE BOYUT KÜÇÜLTEN FEEDBACK FONKSİYONU ---
         function giveFeedback(isCorrect) {
             const messageArea = document.getElementById("feedback-message");
             document.getElementById("btn-yes").disabled = true;
@@ -553,27 +553,36 @@
                 messageArea.innerText = currentLang === 'tr' ? "✖ Geri bildirim alındı. Fotoğraf incelenmek üzere gönderildi." : "✖ Feedback received. Photo sent for review.";
             }
 
-            // --- FOTOĞRAFI ALMA İŞLEMİ ---
-            let imageBase64 = "";
-            
-            // Eğer dosya yüklendiyse onu al
-            const uploadedImg = document.getElementById("uploaded-image");
-            if (uploadedImg.style.display === "block") {
-                imageBase64 = uploadedImg.src;
-            } 
-            // Eğer kameradan canlı görüntü varsa, o anki kareyi yakala (Canvas'tan)
-            else if (webcam && webcam.canvas) {
-                imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7); // 0.7 kalite
-            }
-
             // --- GOOGLE SHEETS VERİ GÖNDERME ---
             const params = new URLSearchParams();
             params.append("Karar", isCorrect ? "DOGRU" : "HATALI");
             params.append("Tahmin", highestClass); 
             params.append("Dil", currentLang);
             
-            // Sadece "HATALI" denildiğinde resmi gönderelim (Kotanı doldurmamak için)
+            // Sadece "HATALI" denildiğinde resmi gönderelim
             if (!isCorrect) {
+                let imageBase64 = "";
+                const uploadedImg = document.getElementById("uploaded-image");
+
+                // DURUM 1: Dosya Yüklendiyse (Küçülterek al)
+                if (uploadedImg.style.display === "block") {
+                    let canvas = document.createElement("canvas");
+                    let ctx = canvas.getContext("2d");
+                    
+                    let scaleFactor = 800 / uploadedImg.naturalWidth;
+                    if (scaleFactor > 1) scaleFactor = 1; 
+                    
+                    canvas.width = uploadedImg.naturalWidth * scaleFactor;
+                    canvas.height = uploadedImg.naturalHeight * scaleFactor;
+                    
+                    ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
+                    imageBase64 = canvas.toDataURL("image/jpeg", 0.6); // 0.6 kalite
+                } 
+                // DURUM 2: Kamera Açıksa
+                else if (webcam && webcam.canvas) {
+                    imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7);
+                }
+
                 params.append("Resim", imageBase64);
             }
 
@@ -582,7 +591,7 @@
                 mode: "no-cors", 
                 body: params
             })
-            .then(() => console.log("Veri ve Resim Google Sheets'e yollandı."))
+            .then(() => console.log("Veri yollandı."))
             .catch(error => console.error("Hata:", error));
         }
 
