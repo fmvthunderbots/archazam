@@ -55,7 +55,7 @@
         .container::before { top: 10px; left: 10px; }
         .container::after { top: 10px; right: 10px; }
 
-        /* --- YENİ DİL SEÇİCİ TASARIMI --- */
+        /* --- DİL SEÇİCİ TASARIMI --- */
         .lang-switch-wrapper {
             position: absolute;
             top: 15px;
@@ -84,9 +84,7 @@
             border-radius: 4px;
         }
 
-        .lang-opt:hover {
-            color: #fff;
-        }
+        .lang-opt:hover { color: #fff; }
 
         .lang-opt.active {
             background-color: var(--accent-gold);
@@ -94,10 +92,7 @@
         }
 
         .lang-divider {
-            width: 1px;
-            height: 15px;
-            background-color: #555;
-            margin: 0 2px;
+            width: 1px; height: 15px; background-color: #555; margin: 0 2px;
         }
         /* --------------------------------- */
 
@@ -133,102 +128,57 @@
         }
 
         .instruction-text { 
-            font-size: 1rem; 
-            margin-bottom: 15px; 
-            color: var(--text-dark); 
-            line-height: 1.5; /* Satır arası boşluk */
+            font-size: 1rem; margin-bottom: 15px; color: var(--text-dark); line-height: 1.5;
         }
         
         .warning-text { font-size: 0.9rem; color: #b71c1c; margin-bottom: 10px; display: block; }
 
         .civ-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            padding: 0;
-            list-style: none;
-            margin: 0;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+            padding: 0; list-style: none; margin: 0;
         }
 
         .civ-tag {
-            background-color: #fff;
-            border: 1px solid var(--accent-gold);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            background-color: #fff; border: 1px solid var(--accent-gold);
+            padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 5px;
         }
 
         .button-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; }
 
         .action-btn {
-            background-color: var(--text-dark);
-            color: var(--accent-gold);
-            border: 2px solid var(--accent-gold);
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: all 0.3s;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            box-shadow: 0 4px 0 #281815;
-            display: inline-flex; 
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
+            background-color: var(--text-dark); color: var(--accent-gold);
+            border: 2px solid var(--accent-gold); padding: 12px 24px; font-size: 16px;
+            cursor: pointer; border-radius: 2px; transition: all 0.3s;
+            font-family: 'Cinzel', serif; font-weight: 700; text-transform: uppercase;
+            box-shadow: 0 4px 0 #281815; display: inline-flex; align-items: center;
+            gap: 10px; text-decoration: none;
         }
         .action-btn:hover { background-color: var(--primary-clay); transform: translateY(2px); box-shadow: 0 2px 0 #281815; }
         
         /* UYARI STİLİ */
         .upload-warning {
-            color: #c62828;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            margin-top: 5px;
+            color: #c62828; font-size: 0.85rem; font-weight: bold; margin-bottom: 20px; margin-top: 5px;
         }
 
         #visual-area {
-            margin-top: 10px;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 4px solid var(--text-dark);
-            background: #222;
-            min-height: 320px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+            margin-top: 10px; border-radius: 4px; overflow: hidden;
+            border: 4px solid var(--text-dark); background: #222; min-height: 320px;
+            display: flex; align-items: center; justify-content: center; position: relative;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
 
         #placeholder-text {
-            color: var(--accent-gold);
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            position: absolute;
-            z-index: 10;
-            opacity: 0.8;
-            padding: 0 20px;
+            color: var(--accent-gold); font-family: 'Cinzel', serif; font-size: 1.2rem;
+            position: absolute; z-index: 10; opacity: 0.8; padding: 0 20px;
         }
 
         #uploaded-image { max-width: 100%; max-height: 320px; display: none; z-index: 20; border: 2px solid #fff; }
         canvas { z-index: 20; }
 
         #label-container {
-            margin-top: 25px;
-            text-align: left;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px dashed var(--primary-clay);
+            margin-top: 25px; text-align: left; background: rgba(255, 255, 255, 0.5);
+            padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-clay);
         }
 
         .prediction-item { margin-bottom: 12px; font-size: 15px; font-weight: 600; }
@@ -306,6 +256,7 @@
                 <span>🇬🇧</span> EN
             </div>
         </div>
+        
         <h1>ARCHAZAM</h1>
         <p class="subtitle" id="subtitle-text">Eski Medeniyetlerin İzinde...</p>
         
@@ -391,8 +342,8 @@
         // --- AYARLAR ---
         let currentLang = 'tr';
         
-        // SENİN VERDİĞİN YENİ LİNK BURADA:
-        const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzGeukfxAnDZBBDEYZEHc9eTd08spVfCSTFOqVBM3iiTIQAinFRrOhsgzdEw0ttyp5QA/exec";
+        // SENİN YENİ LİNKİN:
+        const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV3V6bLYNIteWuepl1RAvDoTHi0uxYFLBVlV8dtFszGRS1jsc553Y24znW_3LbgvGHIA/exec";
         
         const TM_MODEL_URL = "https://teachablemachine.withgoogle.com/models/Y2HlQGqEh/";
 
@@ -588,6 +539,7 @@
             document.getElementById("btn-no").disabled = false;
         }
 
+        // --- GÜNCELLENMİŞ FEEDBACK FONKSİYONU ---
         function giveFeedback(isCorrect) {
             const messageArea = document.getElementById("feedback-message");
             document.getElementById("btn-yes").disabled = true;
@@ -598,7 +550,20 @@
                 messageArea.innerText = currentLang === 'tr' ? "✔ Katkınız için teşekkürler!" : "✔ Thanks for your contribution!";
             } else {
                 messageArea.style.color = "#c62828";
-                messageArea.innerText = currentLang === 'tr' ? "✖ Geri bildirim alındı." : "✖ Feedback received.";
+                messageArea.innerText = currentLang === 'tr' ? "✖ Geri bildirim alındı. Fotoğraf incelenmek üzere gönderildi." : "✖ Feedback received. Photo sent for review.";
+            }
+
+            // --- FOTOĞRAFI ALMA İŞLEMİ ---
+            let imageBase64 = "";
+            
+            // Eğer dosya yüklendiyse onu al
+            const uploadedImg = document.getElementById("uploaded-image");
+            if (uploadedImg.style.display === "block") {
+                imageBase64 = uploadedImg.src;
+            } 
+            // Eğer kameradan canlı görüntü varsa, o anki kareyi yakala (Canvas'tan)
+            else if (webcam && webcam.canvas) {
+                imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7); // 0.7 kalite
             }
 
             // --- GOOGLE SHEETS VERİ GÖNDERME ---
@@ -606,13 +571,18 @@
             params.append("Karar", isCorrect ? "DOGRU" : "HATALI");
             params.append("Tahmin", highestClass); 
             params.append("Dil", currentLang);
+            
+            // Sadece "HATALI" denildiğinde resmi gönderelim (Kotanı doldurmamak için)
+            if (!isCorrect) {
+                params.append("Resim", imageBase64);
+            }
 
             fetch(SHEET_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors", 
                 body: params
             })
-            .then(() => console.log("Veri Google Sheets'e yollandı."))
+            .then(() => console.log("Veri ve Resim Google Sheets'e yollandı."))
             .catch(error => console.error("Hata:", error));
         }
 
