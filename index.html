@@ -342,8 +342,8 @@
         // --- AYARLAR ---
         let currentLang = 'tr';
         
-        // SENİN YENİ LİNKİN:
-        const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxV3V6bLYNIteWuepl1RAvDoTHi0uxYFLBVlV8dtFszGRS1jsc553Y24znW_3LbgvGHIA/exec";
+        // --- SENİN YENİ LİNKİN BURADA ---
+        const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8lPP5-IQldWIIy_7p7zSJ1FUoszSD_x60Ukx7u3pWsEML9ulPPUwEEorxJpgNvjANUQ/exec";
         
         const TM_MODEL_URL = "https://teachablemachine.withgoogle.com/models/Y2HlQGqEh/";
 
@@ -539,7 +539,7 @@
             document.getElementById("btn-no").disabled = false;
         }
 
-        // --- GÜNCELLENMİŞ VE BOYUT KÜÇÜLTEN FEEDBACK FONKSİYONU ---
+        // --- GÜNCELLENMİŞ FEEDBACK FONKSİYONU (Her durumda resim gönderir) ---
         function giveFeedback(isCorrect) {
             const messageArea = document.getElementById("feedback-message");
             document.getElementById("btn-yes").disabled = true;
@@ -559,30 +559,32 @@
             params.append("Tahmin", highestClass); 
             params.append("Dil", currentLang);
             
-            // Sadece "HATALI" denildiğinde resmi gönderelim
-            if (!isCorrect) {
-                let imageBase64 = "";
-                const uploadedImg = document.getElementById("uploaded-image");
+            // --- RESMİ HER DURUMDA HAZIRLIYORUZ (Sıkıştırmalı) ---
+            let imageBase64 = "";
+            const uploadedImg = document.getElementById("uploaded-image");
 
-                // DURUM 1: Dosya Yüklendiyse (Küçülterek al)
-                if (uploadedImg.style.display === "block") {
-                    let canvas = document.createElement("canvas");
-                    let ctx = canvas.getContext("2d");
-                    
-                    let scaleFactor = 800 / uploadedImg.naturalWidth;
-                    if (scaleFactor > 1) scaleFactor = 1; 
-                    
-                    canvas.width = uploadedImg.naturalWidth * scaleFactor;
-                    canvas.height = uploadedImg.naturalHeight * scaleFactor;
-                    
-                    ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
-                    imageBase64 = canvas.toDataURL("image/jpeg", 0.6); // 0.6 kalite
-                } 
-                // DURUM 2: Kamera Açıksa
-                else if (webcam && webcam.canvas) {
-                    imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7);
-                }
+            // DURUM 1: Dosya Yüklendiyse (Küçülterek al)
+            if (uploadedImg.style.display === "block") {
+                let canvas = document.createElement("canvas");
+                let ctx = canvas.getContext("2d");
+                
+                // Max genişlik 800px
+                let scaleFactor = 800 / uploadedImg.naturalWidth;
+                if (scaleFactor > 1) scaleFactor = 1; 
+                
+                canvas.width = uploadedImg.naturalWidth * scaleFactor;
+                canvas.height = uploadedImg.naturalHeight * scaleFactor;
+                
+                ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
+                imageBase64 = canvas.toDataURL("image/jpeg", 0.6); // 0.6 kalite
+            } 
+            // DURUM 2: Kamera Açıksa
+            else if (webcam && webcam.canvas) {
+                imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7);
+            }
 
+            // Resmi parametrelere ekle
+            if (imageBase64) {
                 params.append("Resim", imageBase64);
             }
 
@@ -591,7 +593,7 @@
                 mode: "no-cors", 
                 body: params
             })
-            .then(() => console.log("Veri yollandı."))
+            .then(() => console.log("Veri ve Resim yollandı."))
             .catch(error => console.error("Hata:", error));
         }
 
