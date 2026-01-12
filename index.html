@@ -339,4 +339,22 @@
                     messageArea.style.color = "#2e7d32";
                     messageArea.innerText = currentLang === 'tr' ? "✔ Katkınız için teşekkürler!" : "✔ Thanks for your contribution!";
                 } else {
-                    messageArea.style.color = "#c6282
+                    messageArea.style.color = "#c62828";
+                    messageArea.innerText = currentLang === 'tr' ? "✖ Geri bildirim alındı. Fotoğraf incelenmek üzere gönderildi." : "✖ Feedback received. Photo sent for review.";
+                }
+                clickedBtn.innerText = originalText;
+                clickedBtn.classList.remove("btn-sending");
+            })
+            .catch(error => {
+                console.error("Hata:", error);
+                messageArea.innerText = "Hata oluştu / Error occurred";
+            });
+        }
+
+        function toggleContactForm() {
+            const formContainer = document.getElementById("contact-form-container");
+            formContainer.style.display = (formContainer.style.display === "none" || formContainer.style.display === "") ? "block" : "none";
+        }
+    </script>
+</body>
+</html>
