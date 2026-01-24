@@ -43,13 +43,24 @@
         #uploaded-image { max-width: 100%; max-height: 320px; display: none; z-index: 20; border: 2px solid #fff; }
         canvas { z-index: 15; max-width: 100%; }
 
-        /* KAMERA ARAYÜZÜ KATMANI (Overlay) */
-        .camera-overlay {
-            position: absolute; bottom: 10px; left: 0; right: 0;
+        /* KAMERA ALT BAR (Deklanşör ve Kapat) */
+        .camera-bottom-bar {
+            position: absolute; bottom: 15px; left: 0; right: 0;
             display: none; justify-content: center; align-items: center;
-            z-index: 30; gap: 20px;
+            z-index: 30; gap: 30px;
         }
         
+        /* SAĞ ÜST ÇEVİRME BUTONU */
+        .camera-top-right-btn {
+            position: absolute; top: 15px; right: 15px;
+            display: none; z-index: 30;
+            background: rgba(0, 0, 0, 0.5); color: #fff;
+            border: 1px solid #fff; padding: 6px 12px;
+            border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+            font-family: 'Lato', sans-serif; font-weight: bold;
+            align-items: center; gap: 5px;
+        }
+
         /* DEKLANŞÖR BUTONU (YUVARLAK) */
         .shutter-btn {
             width: 70px; height: 70px;
@@ -67,8 +78,8 @@
         }
         .shutter-btn:active { transform: scale(0.9); }
 
-        /* ÇEVİRME VE İPTAL BUTONLARI (Overlay içindeki) */
-        .overlay-btn {
+        /* İPTAL BUTONU */
+        .cancel-btn {
             background: rgba(0, 0, 0, 0.5); color: #fff;
             border: 1px solid #fff; padding: 8px 12px;
             border-radius: 20px; cursor: pointer; font-size: 0.9rem;
@@ -87,6 +98,17 @@
         .btn-yes { background-color: var(--museum-green); }
         .btn-no { background-color: var(--ruin-red); }
         .btn-sending { background-color: #555 !important; color: #ddd !important; cursor: wait !important; }
+        
+        /* YENİ ESER YÜKLE BUTONU */
+        #btn-new-artifact {
+            display: none; margin-top: 20px;
+            background-color: var(--accent-gold); color: var(--text-dark);
+            border: none; padding: 12px 24px; border-radius: 4px;
+            font-family: 'Cinzel', serif; font-weight: bold; cursor: pointer;
+            width: 100%; font-size: 1rem;
+        }
+        #btn-new-artifact:hover { background-color: #bfa12f; }
+
         button:disabled { background-color: #9e9e9e !important; cursor: not-allowed; }
 
         #feedback-message { margin-top: 15px; font-weight: 600; color: var(--text-dark); min-height: 20px; }
@@ -132,7 +154,7 @@
         
         <div id="loading-msg">🏺 Model sandıktan çıkarılıyor, bekleyin...</div>
 
-        <div class="button-group">
+        <div class="button-group" id="main-buttons">
             <button class="action-btn" onclick="init()"><span id="btn-cam-text">📷 Fotoğraf Çek</span></button>
             <label for="imageUpload" class="action-btn"><span id="btn-upload-text">📂 Dosyadan Yükle</span></label>
             <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
@@ -146,14 +168,15 @@
             <div id="placeholder-text">🔍 Eseri yükleyiniz.</div>
             <img id="uploaded-image" src="#" alt="Yüklenen Eser" />
             
-            <div id="camera-controls" class="camera-overlay">
-                <button class="overlay-btn" onclick="flipCamera()">🔄 <span id="btn-overlay-flip">Kamerayı Çevir</span></button>
-                
+            <button id="camera-flip-btn" class="camera-top-right-btn" onclick="flipCamera()">
+                📷 <span id="btn-overlay-flip">Çevir</span>
+            </button>
+
+            <div id="camera-bottom-bar" class="camera-bottom-bar">
                 <div class="shutter-btn" onclick="snapPhoto()">
                     <div class="shutter-btn-inner"></div>
                 </div>
-                
-                <button class="overlay-btn" onclick="stopCamera()">✖</button>
+                <button class="cancel-btn" onclick="stopCamera()">✖</button>
             </div>
         </div>
 
@@ -166,6 +189,8 @@
                 <button id="btn-no" class="btn-no" onclick="giveFeedback(false)">✖ HATALI</button>
             </div>
             <div id="feedback-message"></div>
+            
+            <button id="btn-new-artifact" onclick="resetFullApp()">↻ Yeni Eser Yüklemek İçin Tıklayınız</button>
         </div>
 
         <div class="feedback-invite-card">
@@ -210,7 +235,7 @@
                 'btn-yes': '✔ DOĞRU', 'btn-no': '✖ HATALI',
                 'invite-title': 'Görüşleriniz Bizim İçin Değerli', 'invite-desc': 'Archazam\'ı geliştirmemiz için geri bildiriminizi bekliyoruz.', 'btn-contact-text': '✒️ Bize Yazın',
                 'form-title': '📝 İletişim Formu', 'lbl-email': 'E-postanız (İsteğe bağlı):', 'lbl-msg': 'Mesajınız:', 'btn-send': 'GÖNDER', 'loading-msg': '🏺 Model sandıktan çıkarılıyor, bekleyin...',
-                'btn-overlay-flip': 'Kamerayı Çevir', 'btn-retake-text': 'Tekrar Çek'
+                'btn-overlay-flip': 'Çevir', 'btn-retake-text': 'Tekrar Çek', 'btn-new-artifact-text': '↻ Yeni Eser Yüklemek İçin Tıklayınız'
             },
             'en': {
                 'subtitle-text': 'Tracing Ancient Civilizations...',
@@ -222,7 +247,7 @@
                 'btn-yes': '✔ CORRECT', 'btn-no': '✖ WRONG',
                 'invite-title': 'We Value Your Feedback', 'invite-desc': 'We appreciate your feedback to improve Archazam.', 'btn-contact-text': '✒️ Contact Us',
                 'form-title': '📝 Contact Form', 'lbl-email': 'Your Email (Optional):', 'lbl-msg': 'Your Message:', 'btn-send': 'SEND', 'loading-msg': '🏺 Excavating the model, please wait...',
-                'btn-overlay-flip': 'Flip Camera', 'btn-retake-text': 'Retake'
+                'btn-overlay-flip': 'Flip', 'btn-retake-text': 'Retake', 'btn-new-artifact-text': '↻ Click to Upload New Artifact'
             }
         };
 
@@ -244,6 +269,7 @@
             else { document.getElementById('btn-en').classList.add('active'); document.getElementById('btn-tr').classList.remove('active'); }
             const t = translations[currentLang];
             for (const [id, text] of Object.entries(t)) { const el = document.getElementById(id); if (el) el.innerHTML = text; }
+            document.getElementById("btn-new-artifact").innerText = t['btn-new-artifact-text']; // Yeni butonun çevirisi
             if (lastPrediction) updateBars(lastPrediction);
         }
 
@@ -283,7 +309,8 @@
             document.getElementById("btn-retake").style.display = "none";
             
             // Kamera kontrollerini göster
-            document.getElementById("camera-controls").style.display = "flex";
+            document.getElementById("camera-bottom-bar").style.display = "flex";
+            document.getElementById("camera-flip-btn").style.display = "flex";
             
             const container = document.getElementById("visual-area");
             
@@ -304,6 +331,8 @@
             container.appendChild(webcam.canvas);
             
             resetFeedback();
+            // Yeni eser yükle butonunu gizle (eğer açıksa)
+            document.getElementById("btn-new-artifact").style.display = "none";
         }
 
         async function stopCamera() {
@@ -311,7 +340,8 @@
              const container = document.getElementById("visual-area");
              const oldCanvas = container.querySelector("canvas");
              if(oldCanvas) oldCanvas.remove();
-             document.getElementById("camera-controls").style.display = "none";
+             document.getElementById("camera-bottom-bar").style.display = "none";
+             document.getElementById("camera-flip-btn").style.display = "none";
              document.getElementById("placeholder-text").style.display = "block";
         }
 
@@ -336,7 +366,8 @@
                 // Kamerayı durdur ve gizle
                 await webcam.stop();
                 webcam.canvas.style.display = "none";
-                document.getElementById("camera-controls").style.display = "none"; // Tuşları gizle
+                document.getElementById("camera-bottom-bar").style.display = "none"; 
+                document.getElementById("camera-flip-btn").style.display = "none";
                 
                 // "Tekrar Çek" butonunu göster
                 document.getElementById("btn-retake").style.display = "inline-flex";
@@ -403,6 +434,30 @@
             btnYes.innerText = currentLang === 'tr' ? "✔ DOĞRU" : "✔ CORRECT";
             btnNo.innerText = currentLang === 'tr' ? "✖ HATALI" : "✖ WRONG";
             btnYes.classList.remove("btn-sending"); btnNo.classList.remove("btn-sending");
+            document.getElementById("btn-new-artifact").style.display = "none"; // Resetlenince yeni butonu gizle
+        }
+        
+        // TAMAMEN SIFIRLAMA FONKSİYONU
+        function resetFullApp() {
+            document.getElementById("uploaded-image").style.display = "none";
+            document.getElementById("placeholder-text").style.display = "block";
+            document.getElementById("label-container").innerHTML = ""; // Barları temizle
+            document.getElementById("feedback-section").style.display = "none";
+            document.getElementById("btn-retake").style.display = "none";
+            document.getElementById("imageUpload").value = ""; // Dosya seçimini temizle
+            
+            // Eğer model yüklü değilse yükle (garanti olsun) ama görsel alanları sıfırla
+            if (model) {
+                // Barları tekrar boş oluştur
+                maxPredictions = model.getTotalClasses();
+                const labelContainer = document.getElementById("label-container");
+                labelContainer.innerHTML = "";
+                for (let i = 0; i < maxPredictions; i++) {
+                    let div = document.createElement("div"); div.className = "prediction-item";
+                    div.innerHTML = `<div style="display:flex; justify-content:space-between;"><span id="label-name-${i}">Sınıf ${i}</span><span id="label-prob-${i}">%0</span></div><div class="progress-bar-bg"><div id="progress-${i}" class="progress-bar-fill"></div></div>`;
+                    labelContainer.appendChild(div);
+                }
+            }
         }
 
         function giveFeedback(isCorrect) {
@@ -425,7 +480,6 @@
             let imageBase64 = "";
             const uploadedImg = document.getElementById("uploaded-image");
             
-            // Eğer kullanıcı "Fotoğraf Çek" veya "Dosya Yükle" ile resim koymuşsa onu al
             if (uploadedImg.style.display === "block") {
                 let canvas = document.createElement("canvas");
                 let ctx = canvas.getContext("2d");
@@ -436,7 +490,6 @@
                 ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
                 imageBase64 = canvas.toDataURL("image/jpeg", 0.6); 
             } 
-            // Eğer canlı kamerada basmışsa (ki artık deklanşör var, bu ihtimal düşük ama kalsın)
             else if (webcam && webcam.canvas) {
                 imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7);
             }
@@ -458,6 +511,9 @@
                 }
                 clickedBtn.innerText = originalText;
                 clickedBtn.classList.remove("btn-sending");
+                
+                // İŞLEM BİTİNCE YENİ ESER BUTONUNU GÖSTER
+                document.getElementById("btn-new-artifact").style.display = "block";
             })
             .catch(error => {
                 console.error("Hata:", error);
