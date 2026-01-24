@@ -43,14 +43,14 @@
         #uploaded-image { max-width: 100%; max-height: 320px; display: none; z-index: 20; border: 2px solid #fff; }
         canvas { z-index: 15; max-width: 100%; }
 
-        /* KAMERA ALT BAR (Deklanşör ve Kapat) */
+        /* KAMERA ALT BAR (Sadece Deklanşör) */
         .camera-bottom-bar {
-            position: absolute; bottom: 15px; left: 0; right: 0;
+            position: absolute; bottom: 20px; left: 0; right: 0;
             display: none; justify-content: center; align-items: center;
-            z-index: 30; gap: 30px;
+            z-index: 30;
         }
         
-        /* SAĞ ÜST ÇEVİRME BUTONU */
+        /* SAĞ ÜST KÖŞE: ÇEVİR BUTONU */
         .camera-top-right-btn {
             position: absolute; top: 15px; right: 15px;
             display: none; z-index: 30;
@@ -77,14 +77,6 @@
             border-radius: 50%;
         }
         .shutter-btn:active { transform: scale(0.9); }
-
-        /* İPTAL BUTONU */
-        .cancel-btn {
-            background: rgba(0, 0, 0, 0.5); color: #fff;
-            border: 1px solid #fff; padding: 8px 12px;
-            border-radius: 20px; cursor: pointer; font-size: 0.9rem;
-            font-family: 'Lato', sans-serif; font-weight: bold;
-        }
 
         #label-container { margin-top: 25px; text-align: left; background: rgba(255, 255, 255, 0.5); padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-clay); }
         .prediction-item { margin-bottom: 12px; font-size: 15px; font-weight: 600; }
@@ -155,8 +147,8 @@
         <div id="loading-msg">🏺 Model sandıktan çıkarılıyor, bekleyin...</div>
 
         <div class="button-group" id="main-buttons">
-            <button class="action-btn" onclick="init()"><span id="btn-cam-text">📷 Fotoğraf Çek</span></button>
-            <label for="imageUpload" class="action-btn"><span id="btn-upload-text">📂 Dosyadan Yükle</span></label>
+            <button class="action-btn" id="btn-open-camera" onclick="init()"><span id="btn-cam-text">📷 Fotoğraf Çek</span></button>
+            <label for="imageUpload" class="action-btn" id="btn-open-file"><span id="btn-upload-text">📂 Dosyadan Yükle</span></label>
             <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
             
             <button class="action-btn" id="btn-retake" onclick="init()" style="display: none;">🔄 <span id="btn-retake-text">Tekrar Çek</span></button>
@@ -176,7 +168,6 @@
                 <div class="shutter-btn" onclick="snapPhoto()">
                     <div class="shutter-btn-inner"></div>
                 </div>
-                <button class="cancel-btn" onclick="stopCamera()">✖</button>
             </div>
         </div>
 
@@ -269,7 +260,7 @@
             else { document.getElementById('btn-en').classList.add('active'); document.getElementById('btn-tr').classList.remove('active'); }
             const t = translations[currentLang];
             for (const [id, text] of Object.entries(t)) { const el = document.getElementById(id); if (el) el.innerHTML = text; }
-            document.getElementById("btn-new-artifact").innerText = t['btn-new-artifact-text']; // Yeni butonun çevirisi
+            document.getElementById("btn-new-artifact").innerText = t['btn-new-artifact-text']; 
             if (lastPrediction) updateBars(lastPrediction);
         }
 
@@ -333,16 +324,10 @@
             resetFeedback();
             // Yeni eser yükle butonunu gizle (eğer açıksa)
             document.getElementById("btn-new-artifact").style.display = "none";
-        }
-
-        async function stopCamera() {
-             if(webcam) { await webcam.stop(); webcam = null; }
-             const container = document.getElementById("visual-area");
-             const oldCanvas = container.querySelector("canvas");
-             if(oldCanvas) oldCanvas.remove();
-             document.getElementById("camera-bottom-bar").style.display = "none";
-             document.getElementById("camera-flip-btn").style.display = "none";
-             document.getElementById("placeholder-text").style.display = "block";
+            
+            // Ana buton grubunu gizleyelim ki kamera ekranı sade olsun (İsteğe bağlı, mevcut akışta kalabilir)
+             document.getElementById("btn-open-camera").style.display = "none";
+             document.getElementById("btn-open-file").style.display = "none";
         }
 
         async function flipCamera() {
@@ -388,8 +373,17 @@
 
         async function handleImageUpload(event) {
             await loadModel();
-            stopCamera(); // Kamera varsa kapat
             
+            // Kamera varsa kapat
+            if(webcam) { await webcam.stop(); webcam = null; }
+            const container = document.getElementById("visual-area");
+            const oldCanvas = container.querySelector("canvas");
+            if(oldCanvas) oldCanvas.remove();
+            
+            // Kamera arayüzlerini gizle
+            document.getElementById("camera-bottom-bar").style.display = "none";
+            document.getElementById("camera-flip-btn").style.display = "none";
+
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -399,7 +393,11 @@
                     imgElement.src = e.target.result;
                     imgElement.style.display = "block";
                     imgElement.onload = async function() { await predictImage(imgElement); }
+                    
                     resetFeedback();
+                    document.getElementById("btn-open-camera").style.display = "none";
+                    document.getElementById("btn-open-file").style.display = "none";
+                    document.getElementById("btn-retake").style.display = "inline-flex"; // Tekrar yükle yerine geçer
                 }
                 reader.readAsDataURL(file);
             }
@@ -431,33 +429,52 @@
             const btnYes = document.getElementById("btn-yes");
             const btnNo = document.getElementById("btn-no");
             btnYes.disabled = false; btnNo.disabled = false;
-            btnYes.innerText = currentLang === 'tr' ? "✔ DOĞRU" : "✔ CORRECT";
-            btnNo.innerText = currentLang === 'tr' ? "✖ HATALI" : "✖ WRONG";
+            
+            // DİKKAT: Dil ayarına göre buton metnini koru
+            const t = translations[currentLang];
+            btnYes.innerText = t['btn-yes']; 
+            btnNo.innerText = t['btn-no'];
+            
             btnYes.classList.remove("btn-sending"); btnNo.classList.remove("btn-sending");
-            document.getElementById("btn-new-artifact").style.display = "none"; // Resetlenince yeni butonu gizle
+            document.getElementById("btn-new-artifact").style.display = "none"; 
         }
         
-        // TAMAMEN SIFIRLAMA FONKSİYONU
+        // --- TAMAMEN SIFIRLAMA VE BAŞA DÖNME FONKSİYONU ---
         function resetFullApp() {
+            // 1. Görsel Alanı Temizle
             document.getElementById("uploaded-image").style.display = "none";
+            document.getElementById("uploaded-image").src = "#";
             document.getElementById("placeholder-text").style.display = "block";
-            document.getElementById("label-container").innerHTML = ""; // Barları temizle
-            document.getElementById("feedback-section").style.display = "none";
-            document.getElementById("btn-retake").style.display = "none";
-            document.getElementById("imageUpload").value = ""; // Dosya seçimini temizle
             
-            // Eğer model yüklü değilse yükle (garanti olsun) ama görsel alanları sıfırla
+            // 2. Geri Bildirim Alanını Gizle
+            document.getElementById("feedback-section").style.display = "none";
+            document.getElementById("btn-new-artifact").style.display = "none";
+            document.getElementById("feedback-message").innerText = "";
+            
+            // 3. Butonları Eski Haline Getir
+            document.getElementById("btn-retake").style.display = "none";
+            document.getElementById("btn-open-camera").style.display = "inline-flex";
+            document.getElementById("btn-open-file").style.display = "inline-flex";
+            
+            // 4. Input'u temizle
+            document.getElementById("imageUpload").value = ""; 
+            
+            // 5. Barları Sıfırla (Görsel olarak boşalt)
             if (model) {
-                // Barları tekrar boş oluştur
-                maxPredictions = model.getTotalClasses();
-                const labelContainer = document.getElementById("label-container");
-                labelContainer.innerHTML = "";
-                for (let i = 0; i < maxPredictions; i++) {
-                    let div = document.createElement("div"); div.className = "prediction-item";
-                    div.innerHTML = `<div style="display:flex; justify-content:space-between;"><span id="label-name-${i}">Sınıf ${i}</span><span id="label-prob-${i}">%0</span></div><div class="progress-bar-bg"><div id="progress-${i}" class="progress-bar-fill"></div></div>`;
-                    labelContainer.appendChild(div);
+                const maxP = model.getTotalClasses();
+                for (let i = 0; i < maxP; i++) {
+                    const probSpan = document.getElementById(`label-prob-${i}`);
+                    const progressBar = document.getElementById(`progress-${i}`);
+                    if(probSpan) probSpan.innerHTML = "%0";
+                    if(progressBar) progressBar.style.width = "0%";
                 }
             }
+            
+            // 6. Geri bildirim butonlarını resetle
+            const btnYes = document.getElementById("btn-yes");
+            const btnNo = document.getElementById("btn-no");
+            btnYes.disabled = false; btnNo.disabled = false;
+            btnYes.classList.remove("btn-sending"); btnNo.classList.remove("btn-sending");
         }
 
         function giveFeedback(isCorrect) {
