@@ -37,13 +37,43 @@
         .action-btn:hover { background-color: var(--primary-clay); transform: translateY(2px); box-shadow: 0 2px 0 #281815; }
         .upload-warning { color: #c62828; font-size: 0.85rem; font-weight: bold; margin-bottom: 20px; margin-top: 5px; }
 
-        /* Yeni Kamera Çevir Butonu Stili */
-        #btn-flip { display: none; background-color: #5d4037; color: #fff; margin-left: 10px; }
-
-        #visual-area { margin-top: 10px; border-radius: 4px; overflow: hidden; border: 4px solid var(--text-dark); background: #222; min-height: 320px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        /* GÖRSEL ALAN VE KAMERA KONTROLLERİ */
+        #visual-area { margin-top: 10px; border-radius: 4px; overflow: hidden; border: 4px solid var(--text-dark); background: #222; min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
         #placeholder-text { color: var(--accent-gold); font-family: 'Cinzel', serif; font-size: 1.2rem; position: absolute; z-index: 10; opacity: 0.8; padding: 0 20px; }
         #uploaded-image { max-width: 100%; max-height: 320px; display: none; z-index: 20; border: 2px solid #fff; }
-        canvas { z-index: 20; }
+        canvas { z-index: 15; max-width: 100%; }
+
+        /* KAMERA ARAYÜZÜ KATMANI (Overlay) */
+        .camera-overlay {
+            position: absolute; bottom: 10px; left: 0; right: 0;
+            display: none; justify-content: center; align-items: center;
+            z-index: 30; gap: 20px;
+        }
+        
+        /* DEKLANŞÖR BUTONU (YUVARLAK) */
+        .shutter-btn {
+            width: 70px; height: 70px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 4px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 0.1s;
+        }
+        .shutter-btn-inner {
+            width: 55px; height: 55px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        .shutter-btn:active { transform: scale(0.9); }
+
+        /* ÇEVİRME VE İPTAL BUTONLARI (Overlay içindeki) */
+        .overlay-btn {
+            background: rgba(0, 0, 0, 0.5); color: #fff;
+            border: 1px solid #fff; padding: 8px 12px;
+            border-radius: 20px; cursor: pointer; font-size: 0.9rem;
+            font-family: 'Lato', sans-serif; font-weight: bold;
+        }
 
         #label-container { margin-top: 25px; text-align: left; background: rgba(255, 255, 255, 0.5); padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-clay); }
         .prediction-item { margin-bottom: 12px; font-size: 15px; font-weight: 600; }
@@ -107,7 +137,7 @@
             <label for="imageUpload" class="action-btn"><span id="btn-upload-text">📂 Dosyadan Yükle</span></label>
             <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
             
-            <button class="action-btn" id="btn-flip" onclick="flipCamera()">🔄 <span id="btn-flip-text">Çevir</span></button>
+            <button class="action-btn" id="btn-retake" onclick="init()" style="display: none;">🔄 <span id="btn-retake-text">Tekrar Çek</span></button>
         </div>
 
         <p id="upload-warning" class="upload-warning">⚠️ Lütfen daha doğru sonuç almak için ekran görüntüsü yerine sadece eserin fotoğrafını yükleyiniz.</p>
@@ -115,6 +145,16 @@
         <div id="visual-area">
             <div id="placeholder-text">🔍 Eseri yükleyiniz.</div>
             <img id="uploaded-image" src="#" alt="Yüklenen Eser" />
+            
+            <div id="camera-controls" class="camera-overlay">
+                <button class="overlay-btn" onclick="flipCamera()">🔄 <span id="btn-overlay-flip">Kamerayı Çevir</span></button>
+                
+                <div class="shutter-btn" onclick="snapPhoto()">
+                    <div class="shutter-btn-inner"></div>
+                </div>
+                
+                <button class="overlay-btn" onclick="stopCamera()">✖</button>
+            </div>
         </div>
 
         <div id="label-container"></div>
@@ -170,7 +210,7 @@
                 'btn-yes': '✔ DOĞRU', 'btn-no': '✖ HATALI',
                 'invite-title': 'Görüşleriniz Bizim İçin Değerli', 'invite-desc': 'Archazam\'ı geliştirmemiz için geri bildiriminizi bekliyoruz.', 'btn-contact-text': '✒️ Bize Yazın',
                 'form-title': '📝 İletişim Formu', 'lbl-email': 'E-postanız (İsteğe bağlı):', 'lbl-msg': 'Mesajınız:', 'btn-send': 'GÖNDER', 'loading-msg': '🏺 Model sandıktan çıkarılıyor, bekleyin...',
-                'btn-flip-text': 'Çevir'
+                'btn-overlay-flip': 'Kamerayı Çevir', 'btn-retake-text': 'Tekrar Çek'
             },
             'en': {
                 'subtitle-text': 'Tracing Ancient Civilizations...',
@@ -182,7 +222,7 @@
                 'btn-yes': '✔ CORRECT', 'btn-no': '✖ WRONG',
                 'invite-title': 'We Value Your Feedback', 'invite-desc': 'We appreciate your feedback to improve Archazam.', 'btn-contact-text': '✒️ Contact Us',
                 'form-title': '📝 Contact Form', 'lbl-email': 'Your Email (Optional):', 'lbl-msg': 'Your Message:', 'btn-send': 'SEND', 'loading-msg': '🏺 Excavating the model, please wait...',
-                'btn-flip-text': 'Flip'
+                'btn-overlay-flip': 'Flip Camera', 'btn-retake-text': 'Retake'
             }
         };
 
@@ -212,6 +252,7 @@
         let lastPrediction = null; 
         let highestClass = ""; 
         let isBackCamera = true; // Varsayılan: Arka Kamera
+        let isPaused = false; // Görüntü dondu mu?
 
         async function loadModel() {
             if (model || isModelLoading) return;
@@ -236,8 +277,14 @@
 
         async function init() {
             await loadModel();
+            // Arayüz temizliği
             document.getElementById("placeholder-text").style.display = "none";
             document.getElementById("uploaded-image").style.display = "none";
+            document.getElementById("btn-retake").style.display = "none";
+            
+            // Kamera kontrollerini göster
+            document.getElementById("camera-controls").style.display = "flex";
+            
             const container = document.getElementById("visual-area");
             
             // Eğer webcam zaten varsa durdur
@@ -245,37 +292,73 @@
             const oldCanvas = container.querySelector("canvas");
             if(oldCanvas) oldCanvas.remove();
             
+            isPaused = false; // Canlı yayın başlasın
+
             // Ayarlar: flip (ayna) sadece ön kamera ise true olsun. Arka kamerada flip=false
             const flip = !isBackCamera; 
             webcam = new tmImage.Webcam(300, 300, flip); 
             
-            // Environment (arka) veya User (ön) kamerasını seç
             await webcam.setup({ facingMode: isBackCamera ? "environment" : "user" }); 
-            
             await webcam.play();
             window.requestAnimationFrame(loop);
             container.appendChild(webcam.canvas);
             
-            // Çevir butonunu göster
-            document.getElementById("btn-flip").style.display = "inline-flex";
-            
             resetFeedback();
         }
 
-        async function flipCamera() {
-            isBackCamera = !isBackCamera; // Modu değiştir
-            await init(); // Kamerayı yeniden başlat
+        async function stopCamera() {
+             if(webcam) { await webcam.stop(); webcam = null; }
+             const container = document.getElementById("visual-area");
+             const oldCanvas = container.querySelector("canvas");
+             if(oldCanvas) oldCanvas.remove();
+             document.getElementById("camera-controls").style.display = "none";
+             document.getElementById("placeholder-text").style.display = "block";
         }
 
-        async function loop() { webcam.update(); await predict(); window.requestAnimationFrame(loop); }
+        async function flipCamera() {
+            isBackCamera = !isBackCamera; 
+            await init(); 
+        }
+
+        // FOTOĞRAF ÇEKME VE DONDURMA FONKSİYONU
+        async function snapPhoto() {
+            if(webcam && webcam.canvas) {
+                isPaused = true; // Döngüyü durdur
+                
+                // Anlık kareyi al
+                const imageDate = webcam.canvas.toDataURL("image/jpeg");
+                
+                // Resmi ekrana koy
+                const imgElement = document.getElementById("uploaded-image");
+                imgElement.src = imageDate;
+                imgElement.style.display = "block";
+                
+                // Kamerayı durdur ve gizle
+                await webcam.stop();
+                webcam.canvas.style.display = "none";
+                document.getElementById("camera-controls").style.display = "none"; // Tuşları gizle
+                
+                // "Tekrar Çek" butonunu göster
+                document.getElementById("btn-retake").style.display = "inline-flex";
+
+                // Son bir kez tahmin yap (donmuş resim üzerinden)
+                await predictImage(imgElement);
+            }
+        }
+
+        async function loop() { 
+            // Eğer dondurulmadıysa güncellemeye devam et
+            if (webcam && !isPaused) {
+                webcam.update(); 
+                await predict(); 
+                window.requestAnimationFrame(loop); 
+            }
+        }
 
         async function handleImageUpload(event) {
             await loadModel();
-            if(webcam) { await webcam.stop(); webcam = null; const container = document.getElementById("visual-area"); const canvas = container.querySelector("canvas"); if(canvas) canvas.remove(); }
+            stopCamera(); // Kamera varsa kapat
             
-            // Kamera butonunu gizle (gerekirse) veya olduğu gibi bırak
-            document.getElementById("btn-flip").style.display = "none";
-
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -341,6 +424,8 @@
             
             let imageBase64 = "";
             const uploadedImg = document.getElementById("uploaded-image");
+            
+            // Eğer kullanıcı "Fotoğraf Çek" veya "Dosya Yükle" ile resim koymuşsa onu al
             if (uploadedImg.style.display === "block") {
                 let canvas = document.createElement("canvas");
                 let ctx = canvas.getContext("2d");
@@ -350,7 +435,9 @@
                 canvas.height = uploadedImg.naturalHeight * scaleFactor;
                 ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
                 imageBase64 = canvas.toDataURL("image/jpeg", 0.6); 
-            } else if (webcam && webcam.canvas) {
+            } 
+            // Eğer canlı kamerada basmışsa (ki artık deklanşör var, bu ihtimal düşük ama kalsın)
+            else if (webcam && webcam.canvas) {
                 imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7);
             }
             if (imageBase64) params.append("Resim", imageBase64);
