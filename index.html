@@ -1,3 +1,9 @@
+Evet, gönderdiğin kod tam olarak üzerinde çalıştığımız, önbellek (cache) sorununu çözen ve Google Sheets'e sıkıştırılmış fotoğraf gönderen en güncel kod. Bu kodu baz alarak şimdi istediğin kamera özelliklerini ekliyorum.
+Yapılan Değişiklikler:
+ * Varsayılan Arka Kamera: Kod açıldığında artık kendini ("user") değil, dışarıyı ("environment") çeken arka kamerayı açmaya çalışacak.
+ * Kamera Çevirme Butonu: Fotoğraf Çek butonunun yanına yeni bir "Çevir" butonu ekledim.
+ * Ayna Modu Ayarı: Arka kameradayken yazılar ters görünmesin diye "ayna" (mirror) özelliğini kapattım. Ön kameraya geçilirse otomatik açılacak.
+İşte Veri kaybı yaşatmayan, Google E-tablo bağlantısı sağlam ve yeni kamera özellikli Final Kod:
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -32,10 +38,13 @@
         .civ-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0; list-style: none; margin: 0; }
         .civ-tag { background-color: #fff; border: 1px solid var(--accent-gold); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        .button-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; }
+        .button-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
         .action-btn { background-color: var(--text-dark); color: var(--accent-gold); border: 2px solid var(--accent-gold); padding: 12px 24px; font-size: 16px; cursor: pointer; border-radius: 2px; transition: all 0.3s; font-family: 'Cinzel', serif; font-weight: 700; text-transform: uppercase; box-shadow: 0 4px 0 #281815; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
         .action-btn:hover { background-color: var(--primary-clay); transform: translateY(2px); box-shadow: 0 2px 0 #281815; }
         .upload-warning { color: #c62828; font-size: 0.85rem; font-weight: bold; margin-bottom: 20px; margin-top: 5px; }
+
+        /* Yeni Kamera Çevir Butonu Stili */
+        #btn-flip { display: none; background-color: #5d4037; color: #fff; margin-left: 10px; }
 
         #visual-area { margin-top: 10px; border-radius: 4px; overflow: hidden; border: 4px solid var(--text-dark); background: #222; min-height: 320px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
         #placeholder-text { color: var(--accent-gold); font-family: 'Cinzel', serif; font-size: 1.2rem; position: absolute; z-index: 10; opacity: 0.8; padding: 0 20px; }
@@ -103,6 +112,8 @@
             <button class="action-btn" onclick="init()"><span id="btn-cam-text">📷 Fotoğraf Çek</span></button>
             <label for="imageUpload" class="action-btn"><span id="btn-upload-text">📂 Dosyadan Yükle</span></label>
             <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
+            
+            <button class="action-btn" id="btn-flip" onclick="flipCamera()">🔄 <span id="btn-flip-text">Çevir</span></button>
         </div>
 
         <p id="upload-warning" class="upload-warning">⚠️ Lütfen daha doğru sonuç almak için ekran görüntüsü yerine sadece eserin fotoğrafını yükleyiniz.</p>
@@ -164,7 +175,8 @@
                 'placeholder-text': '🔍 Eseri yükleyiniz.', 'feedback-q': '📜 Bu analiz tarihi gerçeklerle uyuşuyor mu?',
                 'btn-yes': '✔ DOĞRU', 'btn-no': '✖ HATALI',
                 'invite-title': 'Görüşleriniz Bizim İçin Değerli', 'invite-desc': 'Archazam\'ı geliştirmemiz için geri bildiriminizi bekliyoruz.', 'btn-contact-text': '✒️ Bize Yazın',
-                'form-title': '📝 İletişim Formu', 'lbl-email': 'E-postanız (İsteğe bağlı):', 'lbl-msg': 'Mesajınız:', 'btn-send': 'GÖNDER', 'loading-msg': '🏺 Model sandıktan çıkarılıyor, bekleyin...'
+                'form-title': '📝 İletişim Formu', 'lbl-email': 'E-postanız (İsteğe bağlı):', 'lbl-msg': 'Mesajınız:', 'btn-send': 'GÖNDER', 'loading-msg': '🏺 Model sandıktan çıkarılıyor, bekleyin...',
+                'btn-flip-text': 'Çevir'
             },
             'en': {
                 'subtitle-text': 'Tracing Ancient Civilizations...',
@@ -175,7 +187,8 @@
                 'placeholder-text': '🔍 Upload an artifact.', 'feedback-q': '📜 Is this analysis historically accurate?',
                 'btn-yes': '✔ CORRECT', 'btn-no': '✖ WRONG',
                 'invite-title': 'We Value Your Feedback', 'invite-desc': 'We appreciate your feedback to improve Archazam.', 'btn-contact-text': '✒️ Contact Us',
-                'form-title': '📝 Contact Form', 'lbl-email': 'Your Email (Optional):', 'lbl-msg': 'Your Message:', 'btn-send': 'SEND', 'loading-msg': '🏺 Excavating the model, please wait...'
+                'form-title': '📝 Contact Form', 'lbl-email': 'Your Email (Optional):', 'lbl-msg': 'Your Message:', 'btn-send': 'SEND', 'loading-msg': '🏺 Excavating the model, please wait...',
+                'btn-flip-text': 'Flip'
             }
         };
 
@@ -204,6 +217,7 @@
         let isModelLoading = false;
         let lastPrediction = null; 
         let highestClass = ""; 
+        let isBackCamera = true; // Varsayılan: Arka Kamera
 
         async function loadModel() {
             if (model || isModelLoading) return;
@@ -231,13 +245,32 @@
             document.getElementById("placeholder-text").style.display = "none";
             document.getElementById("uploaded-image").style.display = "none";
             const container = document.getElementById("visual-area");
+            
+            // Eğer webcam zaten varsa durdur
+            if(webcam) { await webcam.stop(); }
             const oldCanvas = container.querySelector("canvas");
             if(oldCanvas) oldCanvas.remove();
-            webcam = new tmImage.Webcam(300, 300, true); 
-            await webcam.setup(); await webcam.play();
+            
+            // Ayarlar: flip (ayna) sadece ön kamera ise true olsun. Arka kamerada flip=false
+            const flip = !isBackCamera; 
+            webcam = new tmImage.Webcam(300, 300, flip); 
+            
+            // Environment (arka) veya User (ön) kamerasını seç
+            await webcam.setup({ facingMode: isBackCamera ? "environment" : "user" }); 
+            
+            await webcam.play();
             window.requestAnimationFrame(loop);
             container.appendChild(webcam.canvas);
+            
+            // Çevir butonunu göster
+            document.getElementById("btn-flip").style.display = "inline-flex";
+            
             resetFeedback();
+        }
+
+        async function flipCamera() {
+            isBackCamera = !isBackCamera; // Modu değiştir
+            await init(); // Kamerayı yeniden başlat
         }
 
         async function loop() { webcam.update(); await predict(); window.requestAnimationFrame(loop); }
@@ -245,6 +278,10 @@
         async function handleImageUpload(event) {
             await loadModel();
             if(webcam) { await webcam.stop(); webcam = null; const container = document.getElementById("visual-area"); const canvas = container.querySelector("canvas"); if(canvas) canvas.remove(); }
+            
+            // Kamera butonunu gizle (gerekirse) veya olduğu gibi bırak
+            document.getElementById("btn-flip").style.display = "none";
+
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -297,7 +334,6 @@
             const btnNo = document.getElementById("btn-no");
             const clickedBtn = isCorrect ? btnYes : btnNo;
 
-            // KİLİTLE VE YAZIYI DEĞİŞTİR
             btnYes.disabled = true;
             btnNo.disabled = true;
             const originalText = clickedBtn.innerText;
@@ -309,19 +345,16 @@
             params.append("Tahmin", highestClass); 
             params.append("Dil", currentLang);
             
-            // FOTOĞRAF SIKIŞTIRMA (ÖNEMLİ KISIM)
             let imageBase64 = "";
             const uploadedImg = document.getElementById("uploaded-image");
             if (uploadedImg.style.display === "block") {
                 let canvas = document.createElement("canvas");
                 let ctx = canvas.getContext("2d");
-                // Büyük resmi 800px genişliğe küçültüyoruz
                 let scaleFactor = 800 / uploadedImg.naturalWidth;
                 if (scaleFactor > 1) scaleFactor = 1; 
                 canvas.width = uploadedImg.naturalWidth * scaleFactor;
                 canvas.height = uploadedImg.naturalHeight * scaleFactor;
                 ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
-                // Kaliteyi %60'a çekiyoruz (10MB -> 100KB)
                 imageBase64 = canvas.toDataURL("image/jpeg", 0.6); 
             } else if (webcam && webcam.canvas) {
                 imageBase64 = webcam.canvas.toDataURL("image/jpeg", 0.7);
@@ -358,3 +391,4 @@
     </script>
 </body>
 </html>
+
