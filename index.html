@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>ARCHAZAM - Arkeoloji Dedektifi</title>
+    <title>ARCHAZAM - Eğitim ve Keşif Platformu</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -26,6 +26,33 @@
 
         h1 { font-family: 'Cinzel', serif; margin-bottom: 0.5rem; color: var(--text-dark); font-size: 2.8rem; text-shadow: 2px 2px 0px var(--accent-gold); letter-spacing: 2px; margin-top: 20px; border-bottom: 2px solid var(--primary-clay); display: inline-block; padding-bottom: 10px; }
         p.subtitle { color: #6d4c41; margin-bottom: 1.5rem; font-style: italic; font-size: 1.1rem; }
+        
+        /* --- EĞİTİM VE KEŞİF MODU STİLLERİ --- */
+        .discovery-section-wrapper { margin-top: 35px; text-align: center; }
+        .discover-btn { background: linear-gradient(135deg, var(--accent-gold), #ffb300); color: var(--text-dark); border: 2px solid #bfa12f; padding: 15px 20px; font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.2rem; border-radius: 8px; cursor: pointer; box-shadow: 0 6px 15px rgba(212, 175, 55, 0.4); margin-bottom: 10px; width: 100%; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 1px;}
+        .discover-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(212, 175, 55, 0.6); }
+        .discover-note { font-size: 0.85rem; color: #6d4c41; font-style: italic; margin-top: 5px; margin-bottom: 15px; padding: 0 10px; line-height: 1.4; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 20, 15, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--bg-paper); padding: 30px; border-radius: 12px; border: 4px solid var(--accent-gold); max-width: 750px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2rem; color: var(--ruin-red); cursor: pointer; font-weight: bold; transition: transform 0.2s; }
+        .close-modal:hover { transform: scale(1.1); }
+        
+        .civ-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 25px; }
+        .civ-card { background: #fff; border: 2px solid var(--primary-clay); border-radius: 8px; padding: 15px 5px; cursor: pointer; transition: all 0.3s; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .civ-card:hover { background: var(--primary-clay); color: #fff; transform: translateY(-5px); border-color: var(--text-dark); }
+        .civ-card.active { background: var(--text-dark); color: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 8px 15px rgba(0,0,0,0.2); transform: scale(1.05); }
+        .civ-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+        .civ-name { font-family: 'Cinzel', serif; font-weight: bold; font-size: 0.95rem; }
+        
+        .trivia-box { margin-top: 30px; padding: 25px; background: rgba(212, 175, 55, 0.1); border-left: 6px solid var(--accent-gold); display: none; border-radius: 0 8px 8px 0; text-align: left; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .trivia-title { font-family: 'Cinzel', serif; font-size: 1.5rem; margin-bottom: 12px; color: var(--text-dark); border-bottom: 1px dashed var(--primary-clay); padding-bottom: 8px; }
+        .trivia-text { font-size: 1.1rem; line-height: 1.6; color: #4e342e; }
+        .trivia-badge { display: inline-block; background: var(--museum-green); color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
+
         .instruction-container { background-color: rgba(141, 110, 99, 0.08); border: 1px dashed var(--primary-clay); border-radius: 8px; padding: 15px; margin-bottom: 25px; text-align: center; }
         .instruction-text { font-size: 1rem; margin-bottom: 15px; color: var(--text-dark); line-height: 1.5; }
         .warning-text { font-size: 0.9rem; color: #b71c1c; margin-bottom: 10px; display: block; }
@@ -43,39 +70,11 @@
         #uploaded-image { max-width: 100%; max-height: 320px; display: none; z-index: 20; border: 2px solid #fff; }
         canvas { z-index: 15; max-width: 100%; }
 
-        /* KAMERA ALT BAR (Sadece Deklanşör) */
-        .camera-bottom-bar {
-            position: absolute; bottom: 20px; left: 0; right: 0;
-            display: none; justify-content: center; align-items: center;
-            z-index: 30;
-        }
+        .camera-bottom-bar { position: absolute; bottom: 20px; left: 0; right: 0; display: none; justify-content: center; align-items: center; z-index: 30; }
+        .camera-top-right-btn { position: absolute; top: 15px; right: 15px; display: none; z-index: 30; background: rgba(0, 0, 0, 0.5); color: #fff; border: 1px solid #fff; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-family: 'Lato', sans-serif; font-weight: bold; align-items: center; gap: 5px; }
         
-        /* SAĞ ÜST KÖŞE: ÇEVİR BUTONU */
-        .camera-top-right-btn {
-            position: absolute; top: 15px; right: 15px;
-            display: none; z-index: 30;
-            background: rgba(0, 0, 0, 0.5); color: #fff;
-            border: 1px solid #fff; padding: 6px 12px;
-            border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-            font-family: 'Lato', sans-serif; font-weight: bold;
-            align-items: center; gap: 5px;
-        }
-
-        /* DEKLANŞÖR BUTONU (YUVARLAK) */
-        .shutter-btn {
-            width: 70px; height: 70px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 4px solid #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
-            transition: transform 0.1s;
-        }
-        .shutter-btn-inner {
-            width: 55px; height: 55px;
-            background-color: #fff;
-            border-radius: 50%;
-        }
+        .shutter-btn { width: 70px; height: 70px; background-color: rgba(255, 255, 255, 0.2); border: 4px solid #fff; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: transform 0.1s; }
+        .shutter-btn-inner { width: 55px; height: 55px; background-color: #fff; border-radius: 50%; }
         .shutter-btn:active { transform: scale(0.9); }
 
         #label-container { margin-top: 25px; text-align: left; background: rgba(255, 255, 255, 0.5); padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-clay); }
@@ -91,14 +90,7 @@
         .btn-no { background-color: var(--ruin-red); }
         .btn-sending { background-color: #555 !important; color: #ddd !important; cursor: wait !important; }
         
-        /* YENİ ESER YÜKLE BUTONU */
-        #btn-new-artifact {
-            display: none; margin-top: 20px;
-            background-color: var(--accent-gold); color: var(--text-dark);
-            border: none; padding: 12px 24px; border-radius: 4px;
-            font-family: 'Cinzel', serif; font-weight: bold; cursor: pointer;
-            width: 100%; font-size: 1rem;
-        }
+        #btn-new-artifact { display: none; margin-top: 20px; background-color: var(--accent-gold); color: var(--text-dark); border: none; padding: 12px 24px; border-radius: 4px; font-family: 'Cinzel', serif; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; }
         #btn-new-artifact:hover { background-color: #bfa12f; }
 
         button:disabled { background-color: #9e9e9e !important; cursor: not-allowed; }
@@ -131,16 +123,16 @@
         
         <h1>ARCHAZAM</h1>
         <p class="subtitle" id="subtitle-text">Eski Medeniyetlerin İzinde...</p>
-        
+
         <div class="instruction-container">
             <div class="instruction-text" id="instr-text">Tarihi eseri tanımlamak için fotoğrafını çekin veya cihazınızdan yükleyin.<br>Yapay zeka saniyeler içinde analiz etsin.</div>
             <span class="warning-text" id="warn-text">⚠️ Sistem şu an <strong>sadece</strong> aşağıdaki medeniyetleri tanır:</span>
             <div class="civ-list">
-                <span class="civ-tag" id="civ-1">🏛️ Antik Yunan Seramiği</span>
-                <span class="civ-tag" id="civ-2">🌷 Osmanlı İznik Çinisi</span>
-                <span class="civ-tag" id="civ-3">🦁 Hitit Seramiği</span>
-                <span class="civ-tag" id="civ-4">🧱 Sümer Seramiği</span>
-                <span class="civ-tag" id="civ-5">🦅 Nazca Seramiği</span>
+                <span class="civ-tag" id="civ-1">🏛️ Antik Yunan</span>
+                <span class="civ-tag" id="civ-2">🌷 Osmanlı İznik</span>
+                <span class="civ-tag" id="civ-3">🦁 Hitit</span>
+                <span class="civ-tag" id="civ-4">🧱 Sümer</span>
+                <span class="civ-tag" id="civ-5">🦅 Nazca</span>
             </div>
         </div>
         
@@ -172,6 +164,15 @@
         </div>
 
         <div id="label-container"></div>
+
+        <div class="discovery-section-wrapper">
+            <button id="btn-discover" class="discover-btn" onclick="toggleDiscoveryModal()">
+                ✨ <span id="btn-discover-text">Uygarlıkları Keşfet</span> ✨
+            </button>
+            <p class="discover-note" id="discover-note-text">
+                💡 Bilgi havuzumuz, sistem onaylı kullanıcılar tarafından eklenen tarihsel verilerle sürekli genişletilmektedir.
+            </p>
+        </div>
 
         <div id="feedback-section" class="feedback-section">
             <div class="feedback-question" id="feedback-q">📜 Bu analiz tarihi gerçeklerle uyuşuyor mu?</div>
@@ -205,60 +206,154 @@
         </div>
     </div>
 
+    <div id="discovery-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" onclick="toggleDiscoveryModal()">✖</button>
+            <h2 id="modal-title" style="font-family:'Cinzel', serif; color:var(--text-dark); margin-top:0;">Tarihe Dokun</h2>
+            <p id="modal-desc" style="color: #6d4c41; margin-bottom: 5px;">Hangi uygarlığın sırlarını öğrenmek istersiniz?</p>
+            
+            <div class="civ-cards-grid">
+                <div class="civ-card" onclick="showTrivia('greek', this)">
+                    <span class="civ-icon">🏛️</span>
+                    <span class="civ-name" id="card-greek">Antik Yunan</span>
+                </div>
+                <div class="civ-card" onclick="showTrivia('ottoman', this)">
+                    <span class="civ-icon">🌷</span>
+                    <span class="civ-name" id="card-ottoman">Osmanlı</span>
+                </div>
+                <div class="civ-card" onclick="showTrivia('hittite', this)">
+                    <span class="civ-icon">🦁</span>
+                    <span class="civ-name" id="card-hittite">Hitit</span>
+                </div>
+                <div class="civ-card" onclick="showTrivia('sumer', this)">
+                    <span class="civ-icon">🧱</span>
+                    <span class="civ-name" id="card-sumer">Sümer</span>
+                </div>
+                <div class="civ-card" onclick="showTrivia('nazca', this)">
+                    <span class="civ-icon">🦅</span>
+                    <span class="civ-name" id="card-nazca">Nazca</span>
+                </div>
+            </div>
+
+            <div id="trivia-display" class="trivia-box">
+                <span class="trivia-badge" id="trivia-badge-text">BİLİYOR MUYDUNUZ?</span>
+                <h3 id="trivia-title" class="trivia-title">...</h3>
+                <p id="trivia-text" class="trivia-text">Lütfen yukarıdan bir medeniyet seçin.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     
     <script type="text/javascript">
         // --- AYARLAR ---
         let currentLang = 'tr';
-        // SENİN VERDİĞİN LİNK BURADA:
         const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8lPP5-IQldWIIy_7p7zSJ1FUoszSD_x60Ukx7u3pWsEML9ulPPUwEEorxJpgNvjANUQ/exec";
         const TM_MODEL_URL = "https://teachablemachine.withgoogle.com/models/Y2HlQGqEh/";
+
+        // EĞİTİM MODU İÇİN BİLGİ VERİTABANI
+        const triviaData = {
+            'tr': {
+                'greek': { title: "Antik Yunan Seramikleri", text: "Antik Yunan seramikleri genellikle günlük yaşamı, savaşları veya mitolojik Tanrı hikayelerini anlatan 'kırmızı figürlü' veya 'siyah figürlü' çizimleriyle ünlüdür. O dönemde bu çömlekler birer tuval gibi kullanılırdı." },
+                'ottoman': { title: "Osmanlı İznik Çinileri", text: "İznik çinilerinde kullanılan o meşhur kobalt mavisi ve mercan kırmızısı renkler, asırlar boyunca formülünü koruyan özel bir sır tekniğiyle yapılmıştır. En çok lale, karanfil ve gül motifleri kullanılırdı." },
+                'hittite': { title: "Hitit Seramikleri", text: "Anadolu'nun en eski sahiplerinden olan Hititlerin çömlekçiliğindeki en karakteristik eser, sıvıları dökmek için tasarlanmış ve kuş gagasına benzeyen uzun boyunlu 'Gagalı Testi' formudur." },
+                'sumer': { title: "Sümer Seramikleri", text: "Çömlekçi çarkını dünyada ilk kullanan uygarlıklardan biri Sümerlerdir! Bu muazzam buluş, seramik üretimini hızlandırmış, standartlaştırmış ve insanlık tarihinin seyrini değiştirmiştir." },
+                'nazca': { title: "Nazca Seramikleri", text: "Peru'daki Nazca uygarlığı, seramiklerini fırınlamadan önce boyayarak çok renkli (polikrom) eserler üretirdi. Çoğunlukla doğa üstü varlıkları, kesik başları ve çöl hayvanlarını resmetmişlerdir." }
+            },
+            'en': {
+                'greek': { title: "Ancient Greek Pottery", text: "Ancient Greek pottery is famous for its 'red-figure' or 'black-figure' illustrations depicting daily life, wars, or mythological tales. These pots were used as canvases back then." },
+                'ottoman': { title: "Ottoman Iznik Pottery", text: "The famous cobalt blue and coral red colors used in Iznik tiles were created with a special glaze technique whose formula was kept secret for centuries. Tulip and carnation motifs were the most popular." },
+                'hittite': { title: "Hittite Pottery", text: "The most characteristic piece of pottery of the Hittites, one of the oldest civilizations of Anatolia, is the 'Beak-spouted Pitcher' form designed for pouring liquids." },
+                'sumer': { title: "Sumerian Pottery", text: "The Sumerians were one of the first civilizations in the world to use the potter's wheel! This magnificent invention accelerated pottery production and changed the course of human history." },
+                'nazca': { title: "Nazca Pottery", text: "The Nazca civilization in Peru produced highly colorful (polychrome) works by painting their ceramics before firing them. They mostly depicted supernatural beings and desert animals." }
+            }
+        };
 
         const translations = {
             'tr': {
                 'subtitle-text': 'Eski Medeniyetlerin İzinde...',
+                'btn-discover-text': 'Uygarlıkları Keşfet',
+                'discover-note-text': '💡 Bilgi havuzumuz, sistem onaylı kullanıcılar tarafından eklenen tarihsel verilerle sürekli genişletilmektedir.',
                 'instr-text': 'Tarihi eseri tanımlamak için fotoğrafını çekin veya cihazınızdan yükleyin.<br>Yapay zeka saniyeler içinde analiz etsin.',
                 'warn-text': '⚠️ Sistem şu an <strong>sadece</strong> aşağıdaki medeniyetleri tanır:',
-                'civ-1': '🏛️ Antik Yunan Seramiği', 'civ-2': '🌷 Osmanlı İznik Çinisi', 'civ-3': '🦁 Hitit Seramiği', 'civ-4': '🧱 Sümer Seramiği', 'civ-5': '🦅 Nazca Seramiği',
+                'civ-1': '🏛️ Antik Yunan', 'civ-2': '🌷 Osmanlı İznik', 'civ-3': '🦁 Hitit', 'civ-4': '🧱 Sümer', 'civ-5': '🦅 Nazca',
                 'btn-cam-text': '📷 Fotoğraf Çek', 'btn-upload-text': '📂 Dosyadan Yükle', 'upload-warning': '⚠️ Lütfen daha doğru sonuç almak için ekran görüntüsü yerine sadece eserin fotoğrafını yükleyiniz.',
                 'placeholder-text': '🔍 Eseri yükleyiniz.', 'feedback-q': '📜 Bu analiz tarihi gerçeklerle uyuşuyor mu?',
                 'btn-yes': '✔ DOĞRU', 'btn-no': '✖ HATALI',
                 'invite-title': 'Görüşleriniz Bizim İçin Değerli', 'invite-desc': 'Archazam\'ı geliştirmemiz için geri bildiriminizi bekliyoruz.', 'btn-contact-text': '✒️ Bize Yazın',
                 'form-title': '📝 İletişim Formu', 'lbl-email': 'E-postanız (İsteğe bağlı):', 'lbl-msg': 'Mesajınız:', 'btn-send': 'GÖNDER', 'loading-msg': '🏺 Model sandıktan çıkarılıyor, bekleyin...',
-                'btn-overlay-flip': 'Çevir', 'btn-retake-text': 'Tekrar Çek', 'btn-new-artifact-text': '↻ Yeni Eser Yüklemek İçin Tıklayınız'
+                'btn-overlay-flip': 'Çevir', 'btn-retake-text': 'Tekrar Çek', 'btn-new-artifact-text': '↻ Yeni Eser Yüklemek İçin Tıklayınız',
+                // Modal
+                'modal-title': 'Tarihe Dokun', 'modal-desc': 'Hangi uygarlığın sırlarını öğrenmek istersiniz?',
+                'card-greek': 'Antik Yunan', 'card-ottoman': 'Osmanlı', 'card-hittite': 'Hitit', 'card-sumer': 'Sümer', 'card-nazca': 'Nazca',
+                'trivia-badge-text': 'BİLİYOR MUYDUNUZ?'
             },
             'en': {
                 'subtitle-text': 'Tracing Ancient Civilizations...',
+                'btn-discover-text': 'Discover Civilizations',
+                'discover-note-text': '💡 Our knowledge pool is continuously expanded with historical data added by system-approved users.',
                 'instr-text': 'Take a photo or upload one from your device to identify the historical artifact.<br>AI analyzes it in seconds.',
                 'warn-text': '⚠️ The system currently <strong>only</strong> recognizes the following civilizations:',
-                'civ-1': '🏛️ Ancient Greek Pottery', 'civ-2': '🌷 Ottoman Iznik Pottery', 'civ-3': '🦁 Hittite Pottery', 'civ-4': '🧱 Sumerian Pottery', 'civ-5': '🦅 Nazca Pottery',
+                'civ-1': '🏛️ Ancient Greek', 'civ-2': '🌷 Ottoman Iznik', 'civ-3': '🦁 Hittite', 'civ-4': '🧱 Sumerian', 'civ-5': '🦅 Nazca',
                 'btn-cam-text': '📷 Take Photo', 'btn-upload-text': '📂 Upload File', 'upload-warning': '⚠️ For more accurate results, please upload only the photo of the artifact, not a screenshot.',
                 'placeholder-text': '🔍 Upload an artifact.', 'feedback-q': '📜 Is this analysis historically accurate?',
                 'btn-yes': '✔ CORRECT', 'btn-no': '✖ WRONG',
                 'invite-title': 'We Value Your Feedback', 'invite-desc': 'We appreciate your feedback to improve Archazam.', 'btn-contact-text': '✒️ Contact Us',
                 'form-title': '📝 Contact Form', 'lbl-email': 'Your Email (Optional):', 'lbl-msg': 'Your Message:', 'btn-send': 'SEND', 'loading-msg': '🏺 Excavating the model, please wait...',
-                'btn-overlay-flip': 'Flip', 'btn-retake-text': 'Retake', 'btn-new-artifact-text': '↻ Click to Upload New Artifact'
+                'btn-overlay-flip': 'Flip', 'btn-retake-text': 'Retake', 'btn-new-artifact-text': '↻ Click to Upload New Artifact',
+                // Modal
+                'modal-title': 'Touch History', 'modal-desc': 'Which civilization\'s secrets do you want to learn?',
+                'card-greek': 'Ancient Greek', 'card-ottoman': 'Ottoman', 'card-hittite': 'Hittite', 'card-sumer': 'Sumerian', 'card-nazca': 'Nazca',
+                'trivia-badge-text': 'DID YOU KNOW?'
             }
         };
 
-        // --- SAYFA YÜKLENDİĞİNDE DİL KONTROLÜ ---
         window.onload = function() {
-            // URL'de ?lang=en var mı diye bak
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('lang') === 'en') {
                 setLanguage('en');
             }
-            loadModel(); // Modeli hemen yüklemeye başla
+            loadModel(); 
         }
 
-        // --- SAYFAYI YENİLEME VE DİLİ KORUMA FONKSİYONU ---
+        // --- EĞİTİM MODALI FONKSİYONLARI ---
+        function toggleDiscoveryModal() {
+            const modal = document.getElementById('discovery-modal');
+            if(modal.classList.contains('show')) {
+                modal.classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 300);
+            } else {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                // Kutuyu sıfırla
+                document.getElementById('trivia-display').style.display = 'none';
+                document.querySelectorAll('.civ-card').forEach(c => c.classList.remove('active'));
+            }
+        }
+
+        function showTrivia(civKey, element) {
+            // Kartların aktifliğini ayarla
+            document.querySelectorAll('.civ-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+
+            // Bilgileri getir
+            const data = triviaData[currentLang][civKey];
+            const triviaBox = document.getElementById('trivia-display');
+            document.getElementById('trivia-title').innerText = data.title;
+            document.getElementById('trivia-text').innerText = data.text;
+            
+            triviaBox.style.display = 'block';
+            // Animasyonu tetiklemek için reflow
+            triviaBox.style.animation = 'none';
+            triviaBox.offsetHeight; 
+            triviaBox.style.animation = 'fadeIn 0.5s';
+        }
+
         function reloadPage() {
-            // Eğer dil İngilizce ise URL'ye ?lang=en ekleyerek yenile
             if (currentLang === 'en') {
                 window.location.href = window.location.pathname + "?lang=en";
             } else {
-                // Değilse düz yenile
                 window.location.href = window.location.pathname;
             }
         }
@@ -283,8 +378,16 @@
             for (const [id, text] of Object.entries(t)) { const el = document.getElementById(id); if (el) el.innerHTML = text; }
             document.getElementById("btn-new-artifact").innerText = t['btn-new-artifact-text']; 
             if (lastPrediction) updateBars(lastPrediction);
+
+            // Modal açıksa ve bir kart seçiliyse içeriğini güncelle
+            const activeCard = document.querySelector('.civ-card.active');
+            if(activeCard) {
+                const civKey = activeCard.getAttribute('onclick').match(/'([^']+)'/)[1];
+                showTrivia(civKey, activeCard);
+            }
         }
 
+        // --- MEVCUT YZ, KAMERA VE GERİ BİLDİRİM KODLARI ---
         let model, webcam, labelContainer, maxPredictions;
         let isModelLoading = false;
         let lastPrediction = null; 
@@ -315,35 +418,24 @@
 
         async function init() {
             await loadModel();
-            // Arayüz temizliği
             document.getElementById("placeholder-text").style.display = "none";
             document.getElementById("uploaded-image").style.display = "none";
             document.getElementById("btn-retake").style.display = "none";
-            
-            // Kamera kontrollerini göster
             document.getElementById("camera-bottom-bar").style.display = "flex";
             document.getElementById("camera-flip-btn").style.display = "flex";
-            
             const container = document.getElementById("visual-area");
-            
-            // Eğer webcam zaten varsa durdur
             if(webcam) { await webcam.stop(); }
             const oldCanvas = container.querySelector("canvas");
             if(oldCanvas) oldCanvas.remove();
-            
             isPaused = false; 
-
             const flip = !isBackCamera; 
             webcam = new tmImage.Webcam(300, 300, flip); 
-            
             await webcam.setup({ facingMode: isBackCamera ? "environment" : "user" }); 
             await webcam.play();
             window.requestAnimationFrame(loop);
             container.appendChild(webcam.canvas);
-            
             resetFeedback();
             document.getElementById("btn-new-artifact").style.display = "none";
-            
             document.getElementById("btn-open-camera").style.display = "none";
             document.getElementById("btn-open-file").style.display = "none";
         }
@@ -356,7 +448,6 @@
              document.getElementById("camera-bottom-bar").style.display = "none";
              document.getElementById("camera-flip-btn").style.display = "none";
              document.getElementById("placeholder-text").style.display = "block";
-             // Kamera kapatıldıysa butonları geri getir
              document.getElementById("btn-open-camera").style.display = "inline-flex";
              document.getElementById("btn-open-file").style.display = "inline-flex";
         }
@@ -370,18 +461,14 @@
             if(webcam && webcam.canvas) {
                 isPaused = true; 
                 const imageDate = webcam.canvas.toDataURL("image/jpeg");
-                
                 const imgElement = document.getElementById("uploaded-image");
                 imgElement.src = imageDate;
                 imgElement.style.display = "block";
-                
                 await webcam.stop();
                 webcam.canvas.style.display = "none";
                 document.getElementById("camera-bottom-bar").style.display = "none"; 
                 document.getElementById("camera-flip-btn").style.display = "none";
-                
                 document.getElementById("btn-retake").style.display = "inline-flex";
-
                 await predictImage(imgElement);
             }
         }
@@ -396,15 +483,12 @@
 
         async function handleImageUpload(event) {
             await loadModel();
-            
             if(webcam) { await webcam.stop(); webcam = null; }
             const container = document.getElementById("visual-area");
             const oldCanvas = container.querySelector("canvas");
             if(oldCanvas) oldCanvas.remove();
-            
             document.getElementById("camera-bottom-bar").style.display = "none";
             document.getElementById("camera-flip-btn").style.display = "none";
-
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -414,7 +498,6 @@
                     imgElement.src = e.target.result;
                     imgElement.style.display = "block";
                     imgElement.onload = async function() { await predictImage(imgElement); }
-                    
                     resetFeedback();
                     document.getElementById("btn-open-camera").style.display = "none";
                     document.getElementById("btn-open-file").style.display = "none";
@@ -450,11 +533,9 @@
             const btnYes = document.getElementById("btn-yes");
             const btnNo = document.getElementById("btn-no");
             btnYes.disabled = false; btnNo.disabled = false;
-            
             const t = translations[currentLang];
             btnYes.innerText = t['btn-yes']; 
             btnNo.innerText = t['btn-no'];
-            
             btnYes.classList.remove("btn-sending"); btnNo.classList.remove("btn-sending");
             document.getElementById("btn-new-artifact").style.display = "none"; 
         }
@@ -500,7 +581,6 @@
                 body: params
             })
             .then(() => {
-                console.log("Veri ve Resim yollandı.");
                 if (isCorrect) {
                     messageArea.style.color = "#2e7d32";
                     messageArea.innerText = currentLang === 'tr' ? "✔ Katkınız için teşekkürler!" : "✔ Thanks for your contribution!";
@@ -510,8 +590,6 @@
                 }
                 clickedBtn.innerText = originalText;
                 clickedBtn.classList.remove("btn-sending");
-                
-                // İŞLEM BİTİNCE YENİ ESER BUTONUNU GÖSTER
                 document.getElementById("btn-new-artifact").style.display = "block";
             })
             .catch(error => {
