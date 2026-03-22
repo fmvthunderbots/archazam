@@ -31,7 +31,6 @@
         .discovery-section-wrapper { margin-top: 35px; text-align: center; }
         .discover-btn { background: linear-gradient(135deg, var(--accent-gold), #ffb300); color: var(--text-dark); border: 2px solid #bfa12f; padding: 15px 20px; font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.2rem; border-radius: 8px; cursor: pointer; box-shadow: 0 6px 15px rgba(212, 175, 55, 0.4); margin-bottom: 10px; width: 100%; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 1px;}
         .discover-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(212, 175, 55, 0.6); }
-        .discover-note { font-size: 0.85rem; color: #6d4c41; font-style: italic; margin-top: 5px; margin-bottom: 15px; padding: 0 10px; line-height: 1.4; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 20, 15, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(5px); }
         .modal-content { background: var(--bg-paper); padding: 30px; border-radius: 12px; border: 4px solid var(--accent-gold); max-width: 750px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s; }
@@ -167,11 +166,8 @@
 
         <div class="discovery-section-wrapper">
             <button id="btn-discover" class="discover-btn" onclick="toggleDiscoveryModal()">
-                ✨ <span id="btn-discover-text">Uygarlıkları Keşfet</span> ✨
+                ✨ <span id="btn-discover-text">Tarihin Gizli Sırları</span> ✨
             </button>
-            <p class="discover-note" id="discover-note-text">
-                💡 Bilgi havuzumuz, sistem onaylı kullanıcılar tarafından eklenen tarihsel verilerle sürekli genişletilmektedir.
-            </p>
         </div>
 
         <div id="feedback-section" class="feedback-section">
@@ -252,29 +248,28 @@
         const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8lPP5-IQldWIIy_7p7zSJ1FUoszSD_x60Ukx7u3pWsEML9ulPPUwEEorxJpgNvjANUQ/exec";
         const TM_MODEL_URL = "https://teachablemachine.withgoogle.com/models/Y2HlQGqEh/";
 
-        // EĞİTİM MODU İÇİN BİLGİ VERİTABANI
+        // CİDDİ VE BİLİMSEL BİLGİ VERİTABANI
         const triviaData = {
             'tr': {
-                'greek': { title: "Antik Yunan Seramikleri", text: "Antik Yunan seramikleri genellikle günlük yaşamı, savaşları veya mitolojik Tanrı hikayelerini anlatan 'kırmızı figürlü' veya 'siyah figürlü' çizimleriyle ünlüdür. O dönemde bu çömlekler birer tuval gibi kullanılırdı." },
-                'ottoman': { title: "Osmanlı İznik Çinileri", text: "İznik çinilerinde kullanılan o meşhur kobalt mavisi ve mercan kırmızısı renkler, asırlar boyunca formülünü koruyan özel bir sır tekniğiyle yapılmıştır. En çok lale, karanfil ve gül motifleri kullanılırdı." },
-                'hittite': { title: "Hitit Seramikleri", text: "Anadolu'nun en eski sahiplerinden olan Hititlerin çömlekçiliğindeki en karakteristik eser, sıvıları dökmek için tasarlanmış ve kuş gagasına benzeyen uzun boyunlu 'Gagalı Testi' formudur." },
-                'sumer': { title: "Sümer Seramikleri", text: "Çömlekçi çarkını dünyada ilk kullanan uygarlıklardan biri Sümerlerdir! Bu muazzam buluş, seramik üretimini hızlandırmış, standartlaştırmış ve insanlık tarihinin seyrini değiştirmiştir." },
-                'nazca': { title: "Nazca Seramikleri", text: "Peru'daki Nazca uygarlığı, seramiklerini fırınlamadan önce boyayarak çok renkli (polikrom) eserler üretirdi. Çoğunlukla doğa üstü varlıkları, kesik başları ve çöl hayvanlarını resmetmişlerdir." }
+                'greek': { title: "Boya Değil, 2500 Yıllık Kimya", text: "Antik Yunan seramiklerindeki ünlü siyah ve kırmızı figürler aslında boya ile çizilmemiştir. O dönemki ustalar, fırının içindeki oksijen hava akımını ustaca artırıp azaltarak kildeki demir minerallerinin kimyasal tepkimeye girip renk değiştirmesini sağlıyordu. Bu durum, 2500 yıl öncesine ait kusursuz bir kimya mühendisliğidir." },
+                'ottoman': { title: "Kayıp Formül ve Akustik Mühendisliği", text: "Klasik Osmanlı İznik çinilerinin hamurunda %85 oranında kuvars (yarı değerli bir taş) bulunur. Bu yüksek oran çinilere cam gibi bir parlaklık verir, sesi yansıtarak camilerin akustiğini düzenler ve ortamdaki nemi dengeler. Ancak bu üst düzey üretim formülü 17. yüzyılda kaybolmuş ve günümüzde hala birebir aynısı üretilememiştir." },
+                'hittite': { title: "Tortuyu Süzen 'Gagalı Testi' Tasarımı", text: "Hititlerin en bilinen seramik eseri, uç kısmı bir kuş gagasını andıran uzun ve geriye kıvrımlı 'Gagalı Testi' formudur. Bu tasarım sadece estetik bir tercih değildir; içindeki sıvının tortusunu dipte tutarak bardağa temiz bir şekilde dökülmesini sağlayan ileri düzey bir mekanik tasarımdır." },
+                'sumer': { title: "Yatay Eksendeki Mühendislik: Çömlekçi Çarkı", text: "İnsanlık tarihinin dönüm noktalarından biri olan tekerleği icat eden Sümerler, bu fiziksel buluşu sadece ulaşımda kullanmamıştır. Tekerleği yatay bir eksende, merkezkaç kuvvetiyle döndürerek dünyadaki ilk 'çömlekçi çarkını' geliştirmişlerdir. Bu dâhiyane mühendislik hamlesi, elde günlerce süren seramik yapımını dakikalara indirmiş ve tarihte ilk kez tamamen simetrik, standart formda kapların üretilmesini sağlamıştır." },
+                'nazca': { title: "Devasa Çöl Çizgilerinin Taşınabilir Halleri", text: "Peru çöllerine çizilmiş ve sadece uçaktan veya uydudan bakıldığında görülebilen devasa 'Nazca Çizgileri'nin sırrı hala tam olarak çözülememiştir. İlginç olan ise Nazca halkının, çöle kazıdıkları kilometrelerce büyüklükteki bu devasa hayvan ve geometri figürlerinin birebir kopyalarını, ürettikleri seramiklerin üzerine de kusursuzca işlemiş olmalarıdır." }
             },
             'en': {
-                'greek': { title: "Ancient Greek Pottery", text: "Ancient Greek pottery is famous for its 'red-figure' or 'black-figure' illustrations depicting daily life, wars, or mythological tales. These pots were used as canvases back then." },
-                'ottoman': { title: "Ottoman Iznik Pottery", text: "The famous cobalt blue and coral red colors used in Iznik tiles were created with a special glaze technique whose formula was kept secret for centuries. Tulip and carnation motifs were the most popular." },
-                'hittite': { title: "Hittite Pottery", text: "The most characteristic piece of pottery of the Hittites, one of the oldest civilizations of Anatolia, is the 'Beak-spouted Pitcher' form designed for pouring liquids." },
-                'sumer': { title: "Sumerian Pottery", text: "The Sumerians were one of the first civilizations in the world to use the potter's wheel! This magnificent invention accelerated pottery production and changed the course of human history." },
-                'nazca': { title: "Nazca Pottery", text: "The Nazca civilization in Peru produced highly colorful (polychrome) works by painting their ceramics before firing them. They mostly depicted supernatural beings and desert animals." }
+                'greek': { title: "Not Paint, but 2500-Year-Old Chemistry", text: "The famous black and red figures on Ancient Greek ceramics were not actually painted. The master potters of that era manipulated the oxygen airflow inside the kiln, causing the iron minerals in the clay to chemically react and change color. This is an example of flawless chemical engineering from 2500 years ago." },
+                'ottoman': { title: "Lost Formula and Acoustic Engineering", text: "Classical Ottoman Iznik tiles contain 85% quartz (a semi-precious stone) in their paste. This high ratio gives the tiles a glass-like shine, reflects sound to regulate the acoustics of mosques, and balances humidity. However, this high-level production formula was lost in the 17th century and has not been perfectly replicated to this day." },
+                'hittite': { title: "The Sediment-Filtering 'Beak-Spouted' Design", text: "The most well-known ceramic artifact of the Hittites is the 'Beak-Spouted Pitcher', characterized by its long, backward-curving spout resembling a bird's beak. This design was not merely an aesthetic choice; it was an advanced mechanical design that kept the sediment at the bottom, allowing the liquid to be poured cleanly." },
+                'sumer': { title: "Engineering on a Horizontal Axis: The Potter's Wheel", text: "The Sumerians, who invented the wheel—one of the turning points in human history—did not use this physical discovery solely for transportation. By rotating the wheel on a horizontal axis using centrifugal force, they developed the world's first 'potter's wheel'. This ingenious engineering move reduced manual ceramic making from days to minutes, paving the way for the first perfectly symmetrical and standardized vessels in history." },
+                'nazca': { title: "Portable Versions of Giant Desert Lines", text: "The secret of the giant 'Nazca Lines' drawn in the Peruvian deserts, which can only be seen from planes or satellites, has still not been fully solved. What is fascinating is that the Nazca people flawlessly etched exact replicas of these massive animal and geometric figures, which spanned kilometers in the desert, onto the ceramics they produced." }
             }
         };
 
         const translations = {
             'tr': {
                 'subtitle-text': 'Eski Medeniyetlerin İzinde...',
-                'btn-discover-text': 'Uygarlıkları Keşfet',
-                'discover-note-text': '💡 Bilgi havuzumuz, sistem onaylı kullanıcılar tarafından eklenen tarihsel verilerle sürekli genişletilmektedir.',
+                'btn-discover-text': 'Tarihin Gizli Sırları',
                 'instr-text': 'Tarihi eseri tanımlamak için fotoğrafını çekin veya cihazınızdan yükleyin.<br>Yapay zeka saniyeler içinde analiz etsin.',
                 'warn-text': '⚠️ Sistem şu an <strong>sadece</strong> aşağıdaki medeniyetleri tanır:',
                 'civ-1': '🏛️ Antik Yunan', 'civ-2': '🌷 Osmanlı İznik', 'civ-3': '🦁 Hitit', 'civ-4': '🧱 Sümer', 'civ-5': '🦅 Nazca',
@@ -291,8 +286,7 @@
             },
             'en': {
                 'subtitle-text': 'Tracing Ancient Civilizations...',
-                'btn-discover-text': 'Discover Civilizations',
-                'discover-note-text': '💡 Our knowledge pool is continuously expanded with historical data added by system-approved users.',
+                'btn-discover-text': 'Hidden Secrets of History',
                 'instr-text': 'Take a photo or upload one from your device to identify the historical artifact.<br>AI analyzes it in seconds.',
                 'warn-text': '⚠️ The system currently <strong>only</strong> recognizes the following civilizations:',
                 'civ-1': '🏛️ Ancient Greek', 'civ-2': '🌷 Ottoman Iznik', 'civ-3': '🦁 Hittite', 'civ-4': '🧱 Sumerian', 'civ-5': '🦅 Nazca',
